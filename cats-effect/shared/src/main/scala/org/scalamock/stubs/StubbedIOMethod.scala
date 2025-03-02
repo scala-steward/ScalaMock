@@ -10,7 +10,7 @@ class StubbedIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R]
 
   def timesIO: IO[Int] = IO(times)
 
-  def returns(f: => Result): Unit = delegate.returns(f)
+  def returns[RR](f: => RR)(implicit ev: RR <:< Result): Unit = delegate.returns(f)
 
   def times: Int = delegate.times
 

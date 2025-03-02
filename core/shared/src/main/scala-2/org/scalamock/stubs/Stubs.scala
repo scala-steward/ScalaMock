@@ -22,7 +22,6 @@ package org.scalamock.stubs
 
 import org.scalamock.stubs.internal.StubMakerImpl
 
-import java.util.concurrent.atomic.AtomicReference
 import scala.language.experimental.macros
 import scala.language.implicitConversions
 

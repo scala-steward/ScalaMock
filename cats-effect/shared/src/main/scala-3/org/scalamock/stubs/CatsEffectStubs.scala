@@ -3,6 +3,7 @@ package org.scalamock.stubs
 import cats.effect.IO
 import org.scalamock.stubs.{StubbedIOMethod, StubbedIOMethod0}
 import scala.language.implicitConversions
+import scala.util.NotGiven
 
 trait CatsEffectStubs extends StubsBase {
 
@@ -17,7 +18,10 @@ trait CatsEffectStubs extends StubsBase {
 
   final given CatsEffectStubIO = CatsEffectStubIO()
 
-  implicit inline def stubbed[R](inline f: => R): StubbedIOMethod0[R] =
+  implicit inline def stubbed[R](inline f: => R)(using NotGiven[StubbedIOMethod[?, ?]]): StubbedIOMethod0[R] =
+    StubbedIOMethod0[R](stubbed00Impl[R](f))
+
+  implicit inline def stubbed[R](inline f: () => R): StubbedIOMethod0[R] =
     StubbedIOMethod0(stubbed0Impl[R](f))
 
   implicit inline def stubbed[T1, R](inline f: T1 => R): StubbedIOMethod[T1, R] =

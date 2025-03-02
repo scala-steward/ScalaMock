@@ -132,7 +132,7 @@ private[scalamock] class Utils(using val quotes: Quotes):
       case TypeApply(term, types) =>
         searchTermWithMethod(term, argTypes, types)
 
-      case Ident(fun) =>
+      case Ident(fun) if !newApi =>
         report.errorAndAbort(
           s"please declare '$fun' as MockFunctionX or StubFunctionX (e.g val $fun: MockFunction1[X, R] = ... if it has 1 parameter)"
         )

@@ -7,6 +7,7 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.duration.*
 
 enum UserStatus:
   case Normal, Blocked
@@ -42,6 +43,8 @@ class UserAuthService(
 
 
 class UserAuthServiceSpec extends AnyFunSpec, Matchers, Stubs, ScalaFutures:
+  override implicit val patienceConfig: PatienceConfig = PatienceConfig(1.second, 200.millis)
+
   val unknownUserId = 0
   val user = User(1, UserStatus.Normal)
   val blockedUser = User(2, UserStatus.Blocked)

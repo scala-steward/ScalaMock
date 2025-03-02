@@ -10,8 +10,13 @@ inline def stubImpl[T](using
 ): Stub[T] =
   ${ stubMacro[T]('{ createdStubs }, '{ stubUniqueIndexGenerator }) }
 
+
 private
-inline def stubbed0Impl[R](inline f: => R): StubbedMethod0[R] =
+inline def stubbed00Impl[R](inline f: R): StubbedMethod0[R] =
+  ${ stubbed00Macro[R]('{ f }) }
+
+private
+inline def stubbed0Impl[R](inline f: () => R): StubbedMethod0[R] =
   ${ stubbed0Macro[R]('{ f }) }
 
 private
@@ -110,9 +115,15 @@ def stubMacro[T: Type](
 )(using Quotes): Expr[Stub[T]] =
   new internal.StubMaker().newInstance[T](collector, stubUniqueIndexGenerator)
 
+
 @experimental
 private
-def stubbed0Macro[R: Type](f: Expr[R])(using Quotes): Expr[StubbedMethod0[R]] =
+def stubbed00Macro[R: Type](f: Expr[R])(using Quotes): Expr[StubbedMethod0[R]] =
+  new internal.StubMaker().getStubbed00[R](f)
+
+@experimental
+private
+def stubbed0Macro[R: Type](f: Expr[() => R])(using Quotes): Expr[StubbedMethod0[R]] =
   new internal.StubMaker().getStubbed0[R](f)
 
 @experimental
