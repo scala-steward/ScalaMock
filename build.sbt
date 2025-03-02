@@ -1,7 +1,7 @@
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 lazy val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.19")
-lazy val specs2 = Def.setting("org.specs2" %%% "specs2-core" % "4.20.8")
+lazy val specs2 = Def.setting("org.specs2" %%% "specs2-core" % "4.20.9")
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   /**
@@ -46,7 +46,7 @@ lazy val `scalamock-zio` = crossProject(JSPlatform, JVMPlatform)
     commonSettings,
     crossScalaSettings,
     libraryDependencies ++= {
-      val zioVersion = "2.1.14"
+      val zioVersion = "2.1.16"
       Seq(
         "dev.zio" %%% "zio" % zioVersion,
         "dev.zio" %%% "zio-test" % zioVersion % Test,
