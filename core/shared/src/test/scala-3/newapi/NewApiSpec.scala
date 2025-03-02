@@ -1,7 +1,5 @@
 package newapi
 
-package newapi
-
 import com.paulbutcher.test.{PolymorphicTrait, SpecializedClass, SpecializedClass2, TestClass, TestTrait}
 import org.scalamock.stubs.Stubs
 import org.scalatest.funspec.AnyFunSpec
@@ -17,6 +15,8 @@ class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
     m.nullary.returns("a return value")
 
     m.nullary shouldBe "a return value"
+
+    (() => m.nullary).times shouldBe 1
   }
 
   it("cope with infix operators") {
@@ -835,7 +835,7 @@ class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
 
     val obj = new B {}
 
-    m.methodWithUnionReturnType[B]().returns(obj)
+    (() => m.methodWithUnionReturnType[B]()).returns(obj)
 
     m.methodWithUnionReturnType[B]() shouldBe obj
   }

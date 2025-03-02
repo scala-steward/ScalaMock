@@ -62,7 +62,7 @@ trait StubbedMethod0[R] extends StubbedMethod.Order {
    *    foo.foo00() // "abc"
    * }}}
    * */
-  def returns(f: => Result): Unit
+  def returns[RR](f: => RR)(implicit ev: RR <:< Result): Unit
 
   /** Allows to get number of times method was executed.
    *
@@ -301,7 +301,7 @@ object StubbedMethod {
     override def returns(f: Args => Result): Unit =
       resultRef.set(Some(f))
 
-    override def returns(f: => Result): Unit =
+    override def returns[RR](f: => RR)(implicit ev: RR <:< Result): Unit =
       resultRef.set(Some(_ => f))
 
     override def times: Int =

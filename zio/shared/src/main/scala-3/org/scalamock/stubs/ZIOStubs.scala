@@ -5,6 +5,8 @@ import org.scalamock.stubs.{StubbedZIOMethod, StubbedZIOMethod0}
 import scala.language.implicitConversions
 import zio.*
 
+import scala.util.NotGiven
+
 trait ZIOStubs extends StubsBase {
   private[scalamock] class ZIOStubIO extends StubIO {
     type F[+A, +B] = IO[A, B]
@@ -14,8 +16,11 @@ trait ZIOStubs extends StubsBase {
     def flatMap[E, EE >: E, T, T2](fa: IO[E, T])(f: T => IO[EE, T2]) = fa.flatMap(f)
   }
   final given ZIOStubIO = ZIOStubIO()
-  
-  implicit inline def stubbed[R](inline f: => R): StubbedZIOMethod0[R] =
+
+  implicit inline def stubbed[R](inline f: => R)(using NotGiven[StubbedZIOMethod[?, ?]]): StubbedZIOMethod0[R] =
+    StubbedZIOMethod0[R](stubbed00Impl[R](f))
+
+  implicit inline def stubbed[T1, R](inline f: () => R): StubbedZIOMethod0[R] =
     StubbedZIOMethod0[R](stubbed0Impl[R](f))
 
   implicit inline def stubbed[T1, R](inline f: T1 => R): StubbedZIOMethod[T1, R] =

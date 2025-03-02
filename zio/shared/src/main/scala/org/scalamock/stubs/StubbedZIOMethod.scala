@@ -10,7 +10,7 @@ class StubbedZIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R
 
   def timesZIO: UIO[Int] = ZIO.succeed(times)
 
-  def returns(f: => Result): Unit = delegate.returns(f)
+  def returns[RR](f: => RR)(implicit ev: RR <:< Result): Unit = delegate.returns(f)
 
   def times: Int = delegate.times
   
