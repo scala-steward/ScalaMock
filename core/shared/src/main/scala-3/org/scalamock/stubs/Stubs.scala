@@ -53,7 +53,7 @@ trait Stubs extends StubsBase {
   implicit inline def stubbed[R](inline f: () => R): StubbedMethod0[R] =
     stubbed0Impl[R](f)
 
-  implicit inline def stubbed[T1, R](inline f: T1 => R)(using NotGiven[<:<[T1 => R, String]]): StubbedMethod[T1, R] =
+  implicit inline def stubbed[T1, R](inline f: T1 => R): StubbedMethod[T1, R] =
     stubbed1Impl[T1, R](f)
 
   implicit inline def stubbed[T1, T2, R](inline f: (T1, T2) => R): StubbedMethod[(T1, T2), R] =
