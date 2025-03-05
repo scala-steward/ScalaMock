@@ -20,3 +20,4 @@ sonatype.sbt
 .metals/
 .bloop/
 .vscode/
+**/metals.sbt
