@@ -29,8 +29,12 @@ class CallLogSpec extends AnyFunSpec with Matchers with Stubs {
     first.foo.returns(_ => 0)
     first.foo2.returns(_ => 0)
     second.bar.returns(_ => "1")
-    second.bar0().returns("2")
-    second.bar00.returns(3)
+
+    val bar0Stubbed = stubbed(() => second.bar0())
+    val bar00Stubbed = stubbed(() => second.bar00)
+
+    bar0Stubbed.returns("2")
+    bar00Stubbed.returns(3)
 
     first.foo(0, 0)
     second.bar("1")
@@ -52,7 +56,7 @@ class CallLogSpec extends AnyFunSpec with Matchers with Stubs {
     second.bar.isBefore(first.foo) shouldBe true
 
     (() => second.bar00).isAfter(() => second.bar0()) shouldBe true
-    second.bar0().isBefore(second.bar00) shouldBe true
+    bar0Stubbed.isBefore(bar00Stubbed) shouldBe true
 
   }
 }

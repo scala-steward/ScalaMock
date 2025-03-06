@@ -19,7 +19,7 @@ class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
 
   it("not compile with other return type for methods without params v2") {
     val m = stub[TestTrait]
-    "m.nullary.returns(1)" shouldNot compile
+    "(() => m.nullary).returns(1)" shouldNot compile
   }
 
   it("not compile with other return type for methods with one param") {
@@ -44,7 +44,7 @@ class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
 
   it("cope with methods without params") {
     val m = stub[TestTrait]
-    m.nullary.returns("a return value")
+    (() => m.nullary).returns("a return value")
 
     m.nullary shouldBe "a return value"
 
@@ -236,7 +236,7 @@ class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
   it("mock an embeddded trait") {
     val m = stub[TestTrait]
     val e = stub[m.Embedded]
-    m.referencesEmbedded().returns(e)
+    (() => m.referencesEmbedded()).returns(e)
     assertResult(e) {
       m.referencesEmbedded()
     }
@@ -248,8 +248,8 @@ class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
     val e = stub[m.Embedded]
     val o = stub[m.ATrait]
     val i = stub[e.ATrait]
-    e.innerTraitProjected().returns(i)
-    e.outerTraitProjected().returns(o)
+    (() => e.innerTraitProjected()).returns(i)
+    (() => e.outerTraitProjected()).returns(o)
     assertResult(o) {
       e.outerTraitProjected()
     }
@@ -263,8 +263,8 @@ class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
     val e = stub[m.Embedded]
     val o = stub[m.ATrait]
     val i = stub[e.ATrait]
-    e.innerTrait().returns(i)
-    e.outerTrait().returns(o)
+    (() => e.innerTrait()).returns(i)
+    (() => e.outerTrait()).returns(o)
     assertResult(o) {
       e.outerTrait()
     }
@@ -887,7 +887,7 @@ class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
 
     val obj = new A with B {}
 
-    m.methodWithIntersectionReturnType[B]().returns(obj)
+    (() => m.methodWithIntersectionReturnType[B]()).returns(obj)
 
     m.methodWithIntersectionReturnType[B]() shouldBe obj
   }
@@ -981,7 +981,7 @@ class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
 
   it("permit mocking classes build with stackable trait pattern") {
     val mockedClass = stub[A]
-    mockedClass.foo().returns(42)
+    (() => mockedClass.foo()).returns(42)
     (mockedClass.bar).returns(_ => Seq("a", "b", "c"))
     (mockedClass.baz).returns:
       case ("A", 1) => 2

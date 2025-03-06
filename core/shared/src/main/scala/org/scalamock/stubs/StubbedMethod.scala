@@ -47,7 +47,6 @@ import java.util.concurrent.atomic.AtomicReference
  * }}}
  * */
 trait StubbedMethod0[R] extends StubbedMethod.Order {
-  type Result = R
 
   /** Allows to set result for method without arguments.
    *
@@ -62,7 +61,7 @@ trait StubbedMethod0[R] extends StubbedMethod.Order {
    *    foo.foo00() // "abc"
    * }}}
    * */
-  def returns(f: => Result): Unit
+  def returns(f: => R): Unit
 
   /** Allows to get number of times method was executed.
    *
@@ -112,9 +111,6 @@ trait StubbedMethod0[R] extends StubbedMethod.Order {
  * */
 
 trait StubbedMethod[A, R] extends StubbedMethod.Order {
-  type Args = A
-  type Result = R
-
   /** Allows to set result for method with arguments.
    *
    *  Scala 3
@@ -132,7 +128,7 @@ trait StubbedMethod[A, R] extends StubbedMethod.Order {
    * }}}
    *
    * */
-  def returns(f: Args => Result): Unit
+  def returns(f: A => R): Unit
 
   /** Allows to get number of times method was executed.
    *
@@ -172,7 +168,7 @@ trait StubbedMethod[A, R] extends StubbedMethod.Order {
    *   (foo.foo _).times(100) // 0
    * }}}
    * */
-  final def times(args: Args): Int = calls.count(_ == args)
+  final def times(args: A): Int = calls.count(_ == args)
 
   /** Allows to get arguments with which method was executed.
    *
@@ -193,7 +189,7 @@ trait StubbedMethod[A, R] extends StubbedMethod.Order {
    *   (foo.foo _).calls // List(1, 100)
    * }}}
    * */
-  def calls: List[Args]
+  def calls: List[A]
 }
 
 object StubbedMethod {
@@ -259,18 +255,16 @@ object StubbedMethod {
     io: Option[StubIO]
   ) extends StubbedMethod[A, R]
       with StubbedMethod0[R] {
-    override type Result = R
-    override type Args = A
 
     override def toString = asString
 
-    private val callsRef: AtomicReference[List[Args]] =
-      new AtomicReference[List[Args]](Nil)
+    private val callsRef: AtomicReference[List[A]] =
+      new AtomicReference[List[A]](Nil)
 
-    private val resultRef: AtomicReference[Option[Args => Result]] =
-      new AtomicReference[Option[Args => Result]](None)
+    private val resultRef: AtomicReference[Option[A => R]] =
+      new AtomicReference[Option[A => R]](None)
 
-    def impl(args: Args): Result =
+    def impl(args: A): R =
       io match {
         case None =>
           callLog.foreach(_.internal.write(asString))
@@ -290,7 +284,7 @@ object StubbedMethod {
               case Some(f) => f(args).asInstanceOf[io.F[Any, Any]]
               case None => io.die(new NotImplementedError())
             }
-          }.asInstanceOf[Result]
+          }.asInstanceOf[R]
       }
 
     def clear(): Unit = {
@@ -298,16 +292,16 @@ object StubbedMethod {
       resultRef.set(None)
     }
 
-    override def returns(f: Args => Result): Unit =
+    override def returns(f: A => R): Unit =
       resultRef.set(Some(f))
 
-    override def returns(f: => Result): Unit =
+    override def returns(f: => R): Unit =
       resultRef.set(Some(_ => f))
 
     override def times: Int =
       callsRef.get().length
 
-    override def calls: List[Args] =
+    override def calls: List[A] =
       callsRef.get().reverse
 
     override def isBefore(other: Order)(implicit callLog: CallLog): Boolean = {

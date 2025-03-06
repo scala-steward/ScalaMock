@@ -22,6 +22,7 @@ package org.scalamock.stubs
 
 import scala.language.implicitConversions
 import scala.util.NotGiven
+import scala.concurrent.Future
 
 /** Indicates that object of type T was generated */
 opaque type Stub[+T] <: T = T
@@ -47,7 +48,8 @@ trait StubsBase {
 }
 
 trait Stubs extends StubsBase {
-  implicit inline def stubbed[R](inline f: => R)(using R =:= R, NotGiven[StubbedMethod[?, ?]]): StubbedMethod0[R] =
+
+  implicit inline def stubbed[R](inline f: => R)(using R <:< Future[?]): StubbedMethod0[R] =
     stubbed00Impl[R](f)
 
   implicit inline def stubbed[R](inline f: () => R)(using R =:= R): StubbedMethod0[R] =

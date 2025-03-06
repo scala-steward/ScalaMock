@@ -29,19 +29,19 @@ class StubbedIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R]
  *  Same as [[StubbedMethod]], but with additional IO methods.
  */
 class StubbedIOMethod[A, R](delegate: StubbedMethod[A, R]) extends StubbedMethod[A, R] {
-  def returnsIO(f: Args => Result): IO[Unit] = IO(returns(f))
+  def returnsIO(f: A => R): IO[Unit] = IO(returns(f))
 
-  def callsIO: IO[List[Args]] = IO(calls)
+  def callsIO: IO[List[A]] = IO(calls)
 
   def timesIO: IO[Int] = IO(times)
 
-  def timesIO(args: Args): IO[Int] = IO(times(args))
+  def timesIO(args: A): IO[Int] = IO(times(args))
 
-  def returns(f: Args => Result): Unit = delegate.returns(f)
+  def returns(f: A => R): Unit = delegate.returns(f)
 
   def times: Int = delegate.times
 
-  def calls: List[Args] = delegate.calls
+  def calls: List[A] = delegate.calls
 
   def isBefore(other: StubbedMethod.Order)(implicit callLog: CallLog): Boolean =
     delegate.isBefore(other)

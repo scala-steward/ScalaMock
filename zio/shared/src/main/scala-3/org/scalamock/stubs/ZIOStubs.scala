@@ -4,6 +4,7 @@ import org.scalamock.stubs.{StubbedZIOMethod, StubbedZIOMethod0}
 
 import scala.language.implicitConversions
 import zio.*
+import scala.concurrent.Future
 
 import scala.util.NotGiven
 
@@ -17,7 +18,10 @@ trait ZIOStubs extends StubsBase {
   }
   final given ZIOStubIO = ZIOStubIO()
 
-  implicit inline def stubbed[R](inline f: => R)(using R =:= R, NotGiven[StubbedZIOMethod[?, ?]]): StubbedZIOMethod0[R] =
+  implicit inline def stubbed[R](inline f: => R)(using R <:< IO[Any, Any]): StubbedZIOMethod0[R] =
+    StubbedZIOMethod0[R](stubbed00Impl[R](f))
+
+  implicit inline def stubbed[R](inline f: => R)(using R <:< Future[?]): StubbedMethod0[R] =
     StubbedZIOMethod0[R](stubbed00Impl[R](f))
 
   implicit inline def stubbed[T1, R](inline f: () => R)(using R =:= R): StubbedZIOMethod0[R] =
