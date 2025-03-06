@@ -10,6 +10,38 @@ import scala.reflect.ClassTag
 import scala.util.{Failure, Try}
 
 class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
+
+
+  it("not compile with other return type for methods without params") {
+    val m = stub[TestTrait]
+    "(() => m.nullary).returns(1)" shouldNot compile
+  }
+
+  it("not compile with other return type for methods without params v2") {
+    val m = stub[TestTrait]
+    "m.nullary.returns(1)" shouldNot compile
+  }
+
+  it("not compile with other return type for methods with one param") {
+    val m = stub[TestTrait]
+    "m.oneParam.returns((x: Int) => false)" shouldNot compile
+  }
+
+  it("not compile with other arg type for methods with one param") {
+    val m = stub[TestTrait]
+    "m.oneParam.returns((x: String) => 1)" shouldNot compile
+  }
+
+  it("not compile with other arg type for methods with two params") {
+    val m = stub[TestTrait]
+    "m.twoParams.returns((x: Int, x: String) => 1.toString)" shouldNot compile
+  }
+
+  it("not compile with other return type for methods with two params") {
+    val m = stub[TestTrait]
+    "m.twoParams.returns((x: Int, x: Double) => 1)" shouldNot compile
+  }
+
   it("cope with methods without params") {
     val m = stub[TestTrait]
     m.nullary.returns("a return value")

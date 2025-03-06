@@ -6,11 +6,11 @@ import cats.effect.IO
  *  Same as [[StubbedMethod0]], but with additional IO methods.
  */
 class StubbedIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R] {
-  def returnsIO(f: => Result): IO[Unit] = IO(returns(f))
+  def returnsIO(f: => R): IO[Unit] = IO(returns(f))
 
   def timesIO: IO[Int] = IO(times)
 
-  def returns[RR](f: => RR)(implicit ev: RR <:< Result): Unit = delegate.returns(f)
+  def returns(f: => R): Unit = delegate.returns(f)
 
   def times: Int = delegate.times
 
