@@ -1,7 +1,5 @@
 package newapi
 
-package tests
-
 import cats.effect.IO
 import munit.CatsEffectSuite
 import org.scalamock.stubs.{CallLog, CatsEffectStubs}

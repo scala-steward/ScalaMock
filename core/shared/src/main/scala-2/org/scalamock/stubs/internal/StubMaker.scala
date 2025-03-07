@@ -23,7 +23,7 @@ package org.scalamock.stubs.internal
 import org.scalamock.util.MacroAdapter.Context
 import org.scalamock.util.{MacroAdapter, MacroUtils}
 import org.scalamock.stubs.StubbedMethod
-import org.scalamock.stubs.{CallLog, StubIO}
+import org.scalamock.stubs.{CallLog, StubIO, Stub}
 
 private[scalamock]
 class StubMaker[C <: Context](val ctx: C) {
@@ -327,7 +327,7 @@ class StubMaker[C <: Context](val ctx: C) {
     val mocks = methodsToMock.map(mockMethod(_))
     val members = clearMethod(methodsToMock) :: mockIdxVal :: (forwarders ++ mocks)
 
-    def make = {
+    def make: ctx.Expr[Stub[T]] = {
       val result = castTo(anonClass(members), typeToMock)
 
               //println("------------")
@@ -336,7 +336,7 @@ class StubMaker[C <: Context](val ctx: C) {
               //println(show(result))
               //println("------------")
 
-      ctx.Expr[T](q"$createdStubs.bind($result)")
+      ctx.Expr[Stub[T]](q"$createdStubs.bind($result).asInstanceOf[_root_.org.scalamock.stubs.Stub[${weakTypeTag[T]}]]")
     }
   }
 }

@@ -40,7 +40,7 @@ trait StubsBase {
   def stub[T](implicit
     createdStubs: internal.CreatedStubs,
     stubUniqueIndexGenerator: internal.StubUniqueIndexGenerator
-  ): T = macro StubMakerImpl.stub[T]
+  ): Stub[T] = macro StubMakerImpl.stub[T]
 }
 
 trait Stubs extends StubsBase {
