@@ -5,6 +5,12 @@ import org.scalamock.util.MacroAdapter.Context
 
 private[scalamock]
 object ZIOStubMakerImpl {
+  def toStubbedMethod00[R: c.WeakTypeTag](c: Context)(f: c.Expr[R])(ev: c.Expr[Any]): c.Expr[StubbedZIOMethod0[R]] = {
+    import c.universe._
+    val sm = StubbedMethodFinder.find[StubbedMethod0[R]](c)(f, List(c.weakTypeOf[Unit]))
+    c.Expr[StubbedZIOMethod0[R]](q"new _root_.org.scalamock.stubs.StubbedZIOMethod0($sm)")
+  }
+
   def toStubbedMethod0[R: c.WeakTypeTag](c: Context)(f: c.Expr[R]): c.Expr[StubbedZIOMethod0[R]] = {
     import c.universe._
     val sm = StubbedMethodFinder.find[StubbedMethod0[R]](c)(f, List(c.weakTypeOf[Unit]))
