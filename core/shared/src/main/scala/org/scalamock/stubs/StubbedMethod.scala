@@ -21,41 +21,30 @@
 package org.scalamock.stubs
 
 import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.Future
 
 /**
  * Representation of stubbed method without arguments.
  *
- * [[Stubs]] interface provides implicit conversion from selected method to StubbedMethod0.
+ * [[Stubs]] interface provides implicit conversion from selected method to StubbedMethod0
+ *
+ * You need to explicitly convert it to a function () => R
+ * 
  * {{{
  *   trait Foo:
  *     def foo0: Int
  *     def foo00(): String
  *
  *   val foo = stub[Foo]
- * }}}
  *
- * Scala 2
- * {{{
- *   val foo0Stubbed: StubbedMethod0[Int] = (() => foo.foo0)
- *   val foo00Stubbed: StubbedMethod0[String] = (() => foo.foo00())
- * }}}
- *
- * Scala 3
- * {{{
- *   val foo0Stubbed: StubbedMethod0[Int] = foo.foo0
- *   val foo00Stubbed: StubbedMethod0[String] = foo.foo00()
+ *   val foo0Stubbed: StubbedMethod0[Int] = () => foo.foo0
+ *   val foo00Stubbed: StubbedMethod0[String] = () => foo.foo00()
  * }}}
  * */
 trait StubbedMethod0[R] extends StubbedMethod.Order {
 
   /** Allows to set result for method without arguments.
    *
-   *  Scala 3
-   *  {{{
-   *   foo.foo00().returns("abc")
-   *   foo.foo00() // "abc"
-   *  }}}
-   *  Scala 2
    * {{{
    *    (() => foo.foo00()).returns("abc")
    *    foo.foo00() // "abc"
@@ -65,22 +54,13 @@ trait StubbedMethod0[R] extends StubbedMethod.Order {
 
   /** Allows to get number of times method was executed.
    *
-   *  Scala 3
    *  {{{
-   *   foo.foo0.returns(5)
+   *   (() => foo.foo0).returns(5)
    *   foo.foo0
    *   foo.foo0
    *
-   *   foo.foo0.times // 2
+   *   (() => foo.foo0).times // 2
    *  }}}
-   *  Scala 2
-   * {{{
-   *    (() => foo.foo0).returns(5)
-   *    foo.foo0
-   *    foo.foo0
-   *
-   *    (() => foo.foo0).times // 2
-   * }}}
    * */
   def times: Int
 }
@@ -109,7 +89,6 @@ trait StubbedMethod0[R] extends StubbedMethod.Order {
  *   val fooBarStubbed: StubbedMethod[(Boolean, String), String] = foo.fooBar
  * }}}
  * */
-
 trait StubbedMethod[A, R] extends StubbedMethod.Order {
   /** Allows to set result for method with arguments.
    *
@@ -134,7 +113,7 @@ trait StubbedMethod[A, R] extends StubbedMethod.Order {
    *
    *  Scala 3
    *  {{{
-   *   foo.foo.returns(_ => 5)
+   *   foo.foo.returns(x => 5)
    *   foo.foo(1)
    *
    *   foo.foo.times // 1
@@ -171,6 +150,8 @@ trait StubbedMethod[A, R] extends StubbedMethod.Order {
   final def times(args: A): Int = calls.count(_ == args)
 
   /** Allows to get arguments with which method was executed.
+   *  Returns multiple arguments as tuple.
+   *  One list item per call.
    *
    *  Scala 3
    *  {{{

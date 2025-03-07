@@ -22,9 +22,6 @@ trait CatsEffectStubs extends StubsBase {
   implicit inline def stubbed[R](inline f: => R)(using R <:< IO[?]): StubbedIOMethod0[R] =
     StubbedIOMethod0[R](stubbed00Impl[R](f))
 
-  implicit inline def stubbed[R](inline f: => R)(using R <:< Future[?]): StubbedMethod0[R] =
-    stubbed00Impl[R](f)
-
   implicit inline def stubbed[R](inline f: () => R)(using R =:= R): StubbedIOMethod0[R] =
     StubbedIOMethod0(stubbed0Impl[R](f))
 
