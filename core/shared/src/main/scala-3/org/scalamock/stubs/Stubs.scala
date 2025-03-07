@@ -25,7 +25,7 @@ import scala.util.NotGiven
 import scala.concurrent.Future
 
 /** Indicates that object of type T was generated */
-opaque type Stub[+T] <: T = T
+type Stub[+T] <: T
 
 private[scalamock]
 trait StubsBase {
