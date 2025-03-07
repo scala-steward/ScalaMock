@@ -3,7 +3,6 @@ package newapi
 import cats.effect.IO
 import munit.CatsEffectSuite
 import org.scalamock.stubs.{CallLog, CatsEffectStubs}
-import scala.language.higherKinds
 
 class IOSpec extends CatsEffectSuite, CatsEffectStubs:
 
