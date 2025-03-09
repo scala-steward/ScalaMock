@@ -37,6 +37,7 @@ class IOSpec extends CatsEffectSuite with CatsEffectStubs {
       _ <- foo.zeroArgsIO.returnsIO(IO.none[String])
       _ <- foo.zeroArgsIO
       _ <- foo.zeroArgsIO
+      _ <- foo.zeroArgsIO.timesIO
     } yield foo.zeroArgsIO.times
 
     assertIO(result, 2)

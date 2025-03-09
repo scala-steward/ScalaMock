@@ -46,7 +46,7 @@ class StubbedIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R]
    *    } yield fooIOTimes == 2 // true
    * }}}
    * */
-  def timesIO: IO[Int] = IO(times).foreverM
+  def timesIO: IO[Int] = IO(times)
 
   /** Allows to set result for method without arguments.
    *
