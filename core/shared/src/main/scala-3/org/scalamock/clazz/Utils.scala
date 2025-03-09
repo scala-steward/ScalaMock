@@ -29,7 +29,6 @@ private[scalamock] class Utils(using val quotes: Quotes):
   def newApi = false
 
   import quotes.reflect.*
-  def ticketMessage = "Please open a ticket at https://github.com/ScalaMock/ScalaMock/issues"
 
   def parentsOf[T: Type]: List[TypeTree | Term] =
     val tpe = TypeRepr.of[T]
@@ -138,7 +137,11 @@ private[scalamock] class Utils(using val quotes: Quotes):
         )
       case _ =>
         report.errorAndAbort(
-          s"ScalaMock: unrecognised structure ${term.show(using Printer.TreeStructure)}. " + ticketMessage
+          s"""
+              This syntax is only available on Stub[T].
+              Current structure is not recognised: ${term.show}
+              If you think this is a bug - please open a ticket at https://github.com/ScalaMock/ScalaMock/issues"
+          """
         )
 
   extension (tpe: TypeRepr)

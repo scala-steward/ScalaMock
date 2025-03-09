@@ -22,7 +22,8 @@
 package org.scalamock.stubs.internal
 
 import org.scalamock.util.{MacroAdapter, MacroUtils}
-import org.scalamock.stubs.StubbedMethod
+import org.scalamock.stubs.{StubbedMethod, Stub}
+
 
 private[scalamock]
 object StubbedMethodFinder {
@@ -49,16 +50,24 @@ object StubbedMethodFinder {
 
     def transcribeTree(tree: Tree, targs: List[Type] = Nil): c.Expr[M] = {
       tree match {
-        case Select(qualifier, name) => mockedFunctionGetter(qualifier, name, targs)
+        case Select(qualifier, name) =>
+           if (!(qualifier.tpe <:< typeOf[Stub[Any]]))
+             reportError(s"This syntax is only available on Stub[T]")
+           mockedFunctionGetter(qualifier, name, targs)
         case Block(stats, expr) => c.Expr[M](Block(stats, transcribeTree(expr).tree)) // see issue #62
         case Typed(expr, tpt) => transcribeTree(expr)
         case Function(vparams, body) => transcribeTree(body)
         case Apply(fun, args) => transcribeTree(fun)
         case TypeApply(fun, args) => transcribeTree(fun, args.map(_.tpe))
         case Ident(fun) => reportError(s"please declare '$fun' as MockFunctionx or StubFunctionx (e.g val $fun: MockFunction1[X, R] = ... if it has 1 parameter)")
-        case _ => reportError(
-          s"ScalaMock: Unrecognised structure: ${showRaw(tree)}." +
-            "Please open a ticket at https://github.com/paulbutcher/ScalaMock/issues")
+        case _ => 
+          reportError(
+            s"""
+              This syntax is only available on Stub[T].
+              Current structure is not recognised: ${show(tree)}
+              If you think this is a bug - please open a ticket at https://github.com/ScalaMock/ScalaMock/issues"
+            """
+          )
       }
     }
 

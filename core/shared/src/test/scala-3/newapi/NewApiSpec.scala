@@ -45,6 +45,7 @@ class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
   it("cope with methods without params") {
     val m = stub[TestTrait]
     (() => m.nullary).returns("a return value")
+    (() => "").returns("a return value")
 
     m.nullary shouldBe "a return value"
 

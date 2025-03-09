@@ -46,7 +46,7 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
   }
 
   it("cope with infix operators") {
-    val m1 = stub[TestTrait]
+    val m1: TestTrait = stub[TestTrait]
     val m2 = stub[TestTrait]
     val m3 = stub[TestTrait]
     (m1.+ _).returns(_ => m3)
