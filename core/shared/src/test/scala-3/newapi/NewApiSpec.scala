@@ -1149,7 +1149,7 @@ class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
     class WithTC[TC[_]](tc: TC[Int])
     type ID[A] = A
     val foo = stub[WithTC[List]]
-    //val bar = stub[WithTC[ID]]
+    val bar = stub[WithTC[ID]]
   }
 
   it("mock generic arguments") {

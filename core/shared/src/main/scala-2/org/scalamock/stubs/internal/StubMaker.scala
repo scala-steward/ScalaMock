@@ -250,7 +250,7 @@ class StubMaker[C <: Context](val ctx: C) {
 
       val constructorArgumentsTypes = primaryConstructorOpt.map { constructor =>
       val constructorTypeContext = constructor.typeSignatureIn(typeToMock)
-      val constructorArguments = constructor.paramLists
+      val constructorArguments = constructorTypeContext.paramLists
       constructorArguments.map {
           symbols => symbols.map(_.typeSignatureIn(constructorTypeContext))
         }
