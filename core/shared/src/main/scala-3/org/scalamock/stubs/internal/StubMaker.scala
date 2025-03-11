@@ -83,7 +83,7 @@ private[stubs] class StubMaker(
           Symbol.newMethod(
             parent = classSymbol,
             name = ClearStubsMethodName,
-            tpe = TypeRepr.of[Unit],
+            tpe = MethodType(Nil)(_ => Nil, _ => TypeRepr.of[Unit]),
             flags = Flags.EmptyFlags,
             privateWithin = Symbol.noSymbol
           ),

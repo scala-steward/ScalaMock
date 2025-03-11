@@ -934,84 +934,77 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
 
     def call4[T <: Command](cmd: T): Option[cmd.Answer]
 
-    def call5[T <: Command](cmd: T)(x: cmd.Answer): Unit
+    //def call5[T <: Command](cmd: T)(x: cmd.Answer): Unit
 
     def call6[T <: Command](cmd: T): cmd.AnswerConstructor[Int]
 
-    def call7[T <: Command](cmd: T)(x: cmd.AnswerConstructor[String])(y: cmd.Answer): Unit
+    //def call7[T <: Command](cmd: T)(x: cmd.AnswerConstructor[String])(y: cmd.Answer): Unit
   }
 
-/*
+
   it("path dependent in return type") {
     val pathDependent = stub[PathDependent]
 
-    (pathDependent.call0[IntCommand] _).returns {
-      case `cmd` => 5
-    }
+    (pathDependent.call0[IntCommand] _).returns(_ => 5)
 
     pathDependent.call0(cmd) shouldBe 5
-  }*/
-/*
+  }
+
   it("path dependent in return type and parameter in last parameter list") {
     val pathDependent = stub[PathDependent]
 
-    (pathDependent.call1(_: Int)(_: IntCommand)).returns {
-      case (5, `cmd`) => 5
-    }
+    (pathDependent.call1(_: Int)(_: IntCommand)).returns(_ => 5)
 
     pathDependent.call1(5)(cmd) shouldBe 5
   }
+  
 
   it("path dependent in return type and parameter in middle parameter list ") {
     val pathDependent = stub[PathDependent]
 
-    (pathDependent.call2(_: String)(_: IntCommand)(_: Int)).returns {
-      case ("5", `cmd`, 5) => 5
-    }
+    (pathDependent.call2(_: String)(_: IntCommand)(_: Int)).returns(_ => 5)
 
     pathDependent.call2("5")(cmd)(5) shouldBe 5
   }
 
+  
   it("path dependent in return type and parameter in first parameter list ") {
     val pathDependent = stub[PathDependent]
 
-    (pathDependent.call3(_: IntCommand)(_: String)(_: Int)).returns {
-      case (`cmd`, "5", 5) => 5
-    }
+    (pathDependent.call3(_: IntCommand)(_: String)(_: Int)).returns(_ => 5)
 
     pathDependent.call3(cmd)("5")(5) shouldBe 5
   }
 
+  
   it("path dependent in tycon return type") {
     val pathDependent = stub[PathDependent]
 
-    pathDependent.call4[IntCommand].returns {
+    (pathDependent.call4[IntCommand] _).returns {
       case `cmd` => Some(5)
       case _ => None
     }
 
     assert(pathDependent.call4(cmd).contains(5))
   }
-
+  
+/*
   it("path dependent in parameter list") {
     val pathDependent = stub[PathDependent]
 
-    (pathDependent.call5(_: IntCommand)(_: Int)).returns {
-      case (`cmd`, 5) => ()
-    }
+    (pathDependent.call5(_: IntCommand)(_: Int)).returns(_ => ())
 
     assert(pathDependent.call5(cmd)(5) == ())
-  }*/
-/*
+  }
+    */
+
   it("path dependent tycon in return type") {
     val pathDependent = stub[PathDependent]
 
-    pathDependent.call6[IntCommand].returns {
-      case `cmd` => Some(5)
-    }
+    (pathDependent.call6[IntCommand] _).returns(_ => Some(5))
 
     assert(pathDependent.call6(cmd).contains(5))
-  }*/
+  }
 /*
   it("path dependent tycon in parameter list") {
     val pathDependent = stub[PathDependent]
@@ -1021,7 +1014,7 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
 
     assert(pathDependent.call7(cmd)(Some("5"))(6) == ())
   }*/
-/*
+
   it("compile without args") {
     class ContextBounded[T: ClassTag] {
       def method(x: Int): Unit = ()
@@ -1029,8 +1022,8 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
 
     val m = stub[ContextBounded[String]]
 
-  }*/
-/*
+  }
+
   it("compile with args") {
     class ContextBounded[T: ClassTag](x: Int) {
       def method(x: Int): Unit = ()
@@ -1038,8 +1031,8 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
 
     val m = stub[ContextBounded[String]]
 
-  }*/
-/*
+  }
+
   it("compile with provided explicitly type class") {
     class ContextBounded[T](x: ClassTag[T]) {
       def method(x: Int): Unit = ()
@@ -1047,23 +1040,23 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
 
     val m = stub[ContextBounded[String]]
 
-  }*/
-/*
+  }
+
   it("mock type constructor arguments") {
     class WithTC[TC[_]](tc: TC[Int])
     type ID[A] = A
     val foo = stub[WithTC[List]]
-    //val bar = stub[WithTC[ID]]
-  }*/
-/*
+    val bar = stub[WithTC[ID]]
+  }
+
   it("mock generic arguments") {
     class WithGeneric[T](t: T)
 
     val foo = stub[WithGeneric[String]]
     val bar = stub[WithGeneric[Int]]
-  }*/
+  }
 
-  /*it("mock type constructor context bounds") {
+  it("mock type constructor context bounds") {
     trait Async[F[_]]
     class A[F[_] : Async](val b: B[F])
     class B[F[_] : Async](val c: C[F])
@@ -1072,7 +1065,7 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
     val foo = stub[A[List]]
     val bar = stub[B[List]]
     val baz = stub[C[List]]
-  }*/
+  }
 
   case class CaseClass(a: Int)
 

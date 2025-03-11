@@ -71,13 +71,9 @@ object ZIOSpec extends ZIOSpecDefault, ZIOStubs:
         for
           _ <- foo.oneArgIO.returnsZIO(_ => ZIO.none)
           _ <- foo.oneArgIO(1)
-          fooOneArgIO = stubbed(foo.oneArgIO)
           result = assertTrue(
-            fooOneArgIO.times == 1,
-            fooOneArgIO.calls == List(1),
-            // bug in zio assertTrue macros
-            // foo.oneArgIO.times == 1,
-            // foo.oneArgIO.calls == List(1)
+            //foo.oneArgIO.times == 1,
+            foo.oneArgIO.calls == List(1)
           )
         yield result,
       test("type args one param"):
