@@ -67,7 +67,7 @@ lazy val `scalamock-cats-effect` = crossProject(JSPlatform, JVMPlatform)
     crossScalaSettings,
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % "3.5.7",
-      "org.typelevel" %% "munit-cats-effect" % "2.0.0" % Test
+      "org.typelevel" %% "munit-cats-effect" % "2.1.0" % Test
     )
   )
   .jsSettings(name := "scalamock-cats-effect")
