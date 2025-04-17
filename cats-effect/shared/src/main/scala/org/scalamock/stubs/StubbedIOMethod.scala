@@ -35,6 +35,50 @@ class StubbedIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R]
    * */
   def returnsIO(f: => R): IO[Unit] = IO(returns(f))
 
+  /** Allows to set result for method without arguments.
+   *
+   * {{{
+   *    (() => foo.foo00()).returns("result")
+   *    foo.fooIO.returns(IO(1))
+   * }}}
+   * */
+  def returns(f: => R): Unit = delegate.returns(f)
+
+
+  /** Allows to set success for method without arguments. Returns IO.
+   *
+   * {{{
+   *    for {
+   *      _ <- foo.fooIO.succeedsWith(1)
+   *    } yield ()
+   * }}}
+   * */
+  def succeedsWith[RR](value: => RR)(implicit ev: IO[RR] <:< R): IO[Unit] =
+    returnsIO(ev(IO(value)))
+
+  /** Allows raise error for method without arguments. Returns IO.
+   *
+   * {{{
+   *    for {
+   *      _ <- foo.fooIO.failsWith(1)
+   *    } yield ()
+   * }}}
+   * */
+  def raisesErrorWith(ex: => Throwable)(implicit ev: IO[Nothing] <:< R): IO[Unit] =
+    returnsIO(ev(IO.raiseError(ex)))
+
+  /** Allows to get number of times method was executed.
+   *
+   * {{{
+   *    for {
+   *      _ <- foo.fooIO.returnsIO(IO(1))
+   *      _ <- foo.fooIO
+   *      _ <- foo.fooIO
+   *    } yield foo.fooIO.times == 2 // true
+   * }}}
+   * */
+  def times: Int = delegate.times
+
   /** Allows to get number of times method was executed. Returns IO.
    *
    * {{{
@@ -48,26 +92,6 @@ class StubbedIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R]
    * */
   def timesIO: IO[Int] = IO(times)
 
-  /** Allows to set result for method without arguments.
-   *
-   * {{{
-   *    (() => foo.foo00()).returns("result")
-   *    foo.fooIO.returns(IO(1))
-   * }}}
-   * */
-  def returns(f: => R): Unit = delegate.returns(f)
-
-  /** Allows to get number of times method was executed.
-   *
-   * {{{
-   *    for {
-   *      _ <- foo.fooIO.returnsIO(IO(1))
-   *      _ <- foo.fooIO
-   *      _ <- foo.fooIO
-   *    } yield foo.fooIO.times == 2 // true
-   * }}}
-   * */
-  def times: Int = delegate.times
 
   /** Returns true if this method was called before other method. */
   def isBefore(other: StubbedMethod.Order)(implicit callLog: CallLog): Boolean =
@@ -127,6 +151,37 @@ class StubbedIOMethod[A, R](delegate: StubbedMethod[A, R]) extends StubbedMethod
    *  }}}
    * */
   def returnsIO(f: A => R): IO[Unit] = IO(returns(f))
+
+  /** Allows to set success for method with arguments. Returns IO.
+   *
+   *  Scala 3
+   *  {{{
+   *   for
+   *     _ <- foo.bar.succeedsWith(1)
+   *   yield ()
+   *  }}}
+   *
+   *  Scala 2
+   *  {{{
+   *   for {
+   *     _ <- (foo.bar _).succeedsWith(1)
+   *   } yield ()
+   *  }}}
+   * */
+  def succeedsWith[RR](value: => RR)(implicit ev: IO[RR] <:< R): IO[Unit] =
+    returnsIO(_ => ev(IO(value)))
+
+  /** Allows raise error for method without arguments. Returns IO.
+   *
+   * {{{
+   *    for {
+   *      _ <- foo.fooIO.failsWith(1)
+   *    } yield ()
+   * }}}
+   * */
+  def raisesErrorWith(ex: => Throwable)(implicit ev: IO[Nothing] <:< R): IO[Unit] =
+    returnsIO(_ => ev(IO.raiseError(ex)))
+
 
   /** Allows to get arguments with which method was executed. Returns IO
    * 

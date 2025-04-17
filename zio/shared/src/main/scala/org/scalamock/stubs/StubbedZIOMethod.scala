@@ -35,6 +35,42 @@ class StubbedZIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R
    * */
   def returnsZIO(f: => R): UIO[Unit] = ZIO.succeed(returns(f))
 
+  /** Allows to set success for method without arguments. Returns ZIO.
+   *
+   * {{{
+   *    for {
+   *      _ <- (() => foo.foo00()).succeedsWith("result")
+   *      _ <- foo.fooIO.succeedsWith(1)
+   *    } yield ()
+   * }}}
+   * */
+  def succeedsWith[RR](f: => RR)(implicit ev: IO[Nothing, RR] <:< R): UIO[Unit] =
+    ZIO.succeed(returns(ev(Exit.succeed(f))))
+
+  /** Allows set fail result for method without arguments. Returns ZIO.
+   *
+   * {{{
+   *    for {
+   *      _ <- (() => foo.foo00()).failsWith("result")
+   *      _ <- foo.fooIO.failsWith(1)
+   *    } yield ()
+   * }}}
+   * */
+  def failsWith[RR](f: => RR)(implicit ev: IO[RR, Nothing] <:< R): UIO[Unit] =
+    ZIO.succeed(returns(ev(Exit.fail(f))))
+
+  /** Allows set die result for method without arguments. Returns ZIO.
+   *
+   * {{{
+   *    for {
+   *      _ <- (() => foo.foo00()).diesWith(new Exception("foo"))
+   *      _ <- foo.fooIO.diesWith(new Exception("bar"))
+   *    } yield ()
+   * }}}
+   * */
+  def diesWith(f: => Throwable)(implicit ev: UIO[Nothing] <:< R): UIO[Unit] =
+    ZIO.succeed(returns(ev(Exit.die(f))))
+
   /** Allows to get number of times method was executed. Returns ZIO
    *
    * {{{
@@ -131,6 +167,64 @@ class StubbedZIOMethod[A, R](delegate: StubbedMethod[A, R]) extends StubbedMetho
    *  }}}
    * */
   def returnsZIO(f: A => R): UIO[Unit] = ZIO.succeed(returns(f))
+
+  /** Allows to set success for method with arguments. Returns ZIO
+   *
+   *  Scala 3
+   *  {{{
+   *   for
+   *     _ <- foo.bar.succeedsWith(1)
+   *   yield ()
+   *  }}}
+   *
+   *  Scala 2
+   *  {{{
+   *   for {
+   *     _ <- (foo.bar _).succeedsWith(1)
+   *   } yield ()
+   *  }}}
+   * */
+  def succeedsWith[RR](result: RR)(implicit ev: IO[Nothing, RR] <:< R): UIO[Unit] =
+    returnsZIO(_ => ev(ZIO.succeed(result)))
+
+
+  /** Allows set fail result for method with arguments. Returns ZIO
+   *
+   *  Scala 3
+   *  {{{
+   *   for
+   *     _ <- foo.bar.failsWith("foo")
+   *   yield ()
+   *  }}}
+   *
+   *  Scala 2
+   *  {{{
+   *   for {
+   *     _ <- (foo.bar _).failsWith("foo")
+   *   } yield ()
+   *  }}}
+   * */
+  def failsWith[RR](result: RR)(implicit ev: IO[RR, Nothing] <:< R): UIO[Unit] =
+    returnsZIO(_ => ev(ZIO.fail(result)))
+
+  /** Allows set die result for method with arguments. Returns ZIO
+   *
+   *  Scala 3
+   *  {{{
+   *   for
+   *     _ <- foo.bar.diesWith(new Exception("foo"))
+   *   yield ()
+   *  }}}
+   *
+   *  Scala 2
+   *  {{{
+   *   for {
+   *     _ <- (foo.bar _).diesWith(new Exception("foo"))
+   *   } yield ()
+   *  }}}
+   * */
+  def diesWith(ex: => Throwable)(implicit ev: UIO[Nothing] <:< R): UIO[Unit] =
+    returnsZIO(_ => ev(ZIO.die(ex)))
 
   /** Allows to get arguments with which method was executed. Returns ZIO
    * 
