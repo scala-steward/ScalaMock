@@ -45,7 +45,7 @@ class StubbedZIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R
    * }}}
    * */
   def succeedsWith[RR](f: => RR)(implicit ev: IO[Nothing, RR] <:< R): UIO[Unit] =
-    ZIO.succeed(returns(ev(Exit.succeed(f))))
+    returnsZIO(ev(ZIO.succeed(f)))
 
   /** Allows set fail result for method without arguments. Returns ZIO.
    *
@@ -57,7 +57,7 @@ class StubbedZIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R
    * }}}
    * */
   def failsWith[RR](f: => RR)(implicit ev: IO[RR, Nothing] <:< R): UIO[Unit] =
-    ZIO.succeed(returns(ev(Exit.fail(f))))
+    returnsZIO(ev(ZIO.fail(f)))
 
   /** Allows set die result for method without arguments. Returns ZIO.
    *
