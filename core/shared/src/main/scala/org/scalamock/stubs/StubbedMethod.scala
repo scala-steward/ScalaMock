@@ -21,7 +21,6 @@
 package org.scalamock.stubs
 
 import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.Future
 
 /**
  * Representation of stubbed method without arguments.
@@ -108,6 +107,20 @@ trait StubbedMethod[A, R] extends StubbedMethod.Order {
    *
    * */
   def returns(f: A => R): Unit
+
+  /** Allows to set result for method with arguments.
+   *
+   *  Scala 3
+   *  {{{
+   *   foo.fooBar.returnsWith("true")
+   *  }}}
+   *  Scala 2
+   * {{{
+   *   (foo.fooBar _).returnsWith("true")
+   * }}}
+   *
+   * */
+  final def returnsWith(value: R): Unit = returns(_ => value)
 
   /** Allows to get number of times method was executed.
    *
@@ -252,7 +265,7 @@ object StubbedMethod {
           callsRef.updateAndGet(args :: _)
           resultRef.get() match {
             case Some(f) => f(args)
-            case None => throw new NotImplementedError()
+            case None => throw new NotImplementedError(s"Implementation is missing for [$asString]")
           }
         case Some(io) =>
           io.flatMap(
@@ -263,7 +276,7 @@ object StubbedMethod {
           ) { _ =>
             resultRef.get() match {
               case Some(f) => f(args).asInstanceOf[io.F[Any, Any]]
-              case None => io.die(new NotImplementedError())
+              case None => io.die(new NotImplementedError(s"Implementation is missing for [$asString]"))
             }
           }.asInstanceOf[R]
       }
