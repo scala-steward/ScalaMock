@@ -20,7 +20,7 @@
 
 package org.scalamock.context
 
-import org.scalamock.handlers.{CallHandler, Handlers}
+import org.scalamock.handlers.{CallHandler, Handlers, OrderedHandlers, UnorderedHandlers}
 
 private[scalamock] trait MockContext {
   type ExpectationException <: Throwable
@@ -49,4 +49,27 @@ private[scalamock] trait MockContext {
 
   /** Generates unique names for mocks, stubs, and mock functions */
   def generateMockDefaultName(prefix: String): Symbol = mockNameGenerator.generateMockName(prefix)
+
+  protected def inAnyOrder[T](what: => T): T = {
+    inContext(new UnorderedHandlers)(what)
+  }
+
+  protected def inSequence[T](what: => T): T = {
+    inContext(new OrderedHandlers)(what)
+  }
+
+  protected def inAnyOrderWithLogging[T](what: => T) =
+    inContext(new UnorderedHandlers(logging = true))(what)
+
+  protected def inSequenceWithLogging[T](what: => T) =
+    inContext(new OrderedHandlers(logging = true))(what)
+
+  private def inContext[T](context: Handlers)(what: => T): T = {
+    currentExpectationContext.add(context)
+    val prevContext = currentExpectationContext
+    currentExpectationContext = context
+    val r = what
+    currentExpectationContext = prevContext
+    r
+  }
 }
