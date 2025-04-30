@@ -25,8 +25,8 @@ class CallLogStringSpec extends AnyFunSpec, Matchers, Stubs:
     first.foo.returns(_ => 0)
     first.foo2.returns(_ => 0)
     second.bar.returns(_ => "1")
-    (() => second.bar0()).returns("2")
-    (() => second.bar00).returns(3)
+    (() => second.bar0()).returnsWith("2")
+    (() => second.bar00).returnsWith(3)
 
     first.foo(0, 0)
     second.bar("1")

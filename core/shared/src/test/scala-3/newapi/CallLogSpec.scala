@@ -33,8 +33,8 @@ class CallLogSpec extends AnyFunSpec with Matchers with Stubs {
     val bar0Stubbed = stubbed(() => second.bar0())
     val bar00Stubbed = stubbed(() => second.bar00)
 
-    bar0Stubbed.returns("2")
-    bar00Stubbed.returns(3)
+    bar0Stubbed.returnsWith("2")
+    bar00Stubbed.returnsWith(3)
 
     first.foo(0, 0)
     second.bar("1")

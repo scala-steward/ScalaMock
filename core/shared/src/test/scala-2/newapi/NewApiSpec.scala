@@ -40,7 +40,7 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
 
   it("cope with methods without params") {
     val m = stub[TestTrait]
-    (() => m.nullary).returns("a return value")
+    (() => m.nullary).returnsWith("a return value")
 
     m.nullary shouldBe "a return value"
   }
@@ -243,7 +243,7 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
   it("mock an embeddded trait") {
     val m = stub[TestTrait]
     val e = stub[m.Embedded]
-    (() => m.referencesEmbedded()).returns(e)
+    (() => m.referencesEmbedded()).returnsWith(e)
     assertResult(e) {
       m.referencesEmbedded()
     }
@@ -255,8 +255,8 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
     val e = stub[m.Embedded]
     val o = stub[m.ATrait]
     val i = stub[e.ATrait]
-    (() => e.innerTraitProjected()).returns(i)
-    (() => e.outerTraitProjected()).returns(o)
+    (() => e.innerTraitProjected()).returnsWith(i)
+    (() => e.outerTraitProjected()).returnsWith(o)
     assertResult(o) {
       e.outerTraitProjected()
     }
@@ -270,8 +270,8 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
     val e = stub[m.Embedded]
     val o = stub[m.ATrait]
     val i = stub[e.ATrait]
-    (() => e.innerTrait()).returns(i)
-    (() => e.outerTrait()).returns(o)
+    (() => e.innerTrait()).returnsWith(i)
+    (() => e.outerTrait()).returnsWith(o)
     assertResult(o) {
       e.outerTrait()
     }
@@ -819,7 +819,7 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
 
     val obj = new A with B {}
 
-    (() => m.methodWithIntersectionReturnType[B]()).returns(obj)
+    (() => m.methodWithIntersectionReturnType[B]()).returnsWith(obj)
 
     m.methodWithIntersectionReturnType[B]() shouldBe obj
   }
@@ -875,7 +875,7 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
 
   it("permit mocking classes build with stackable trait pattern") {
     val mockedClass = stub[A]
-    (() => mockedClass.foo()).returns(42)
+    (() => mockedClass.foo()).returnsWith(42)
     (mockedClass.bar _).returns(_ => Seq("a", "b", "c"))
     (mockedClass.baz _).returns {
       case ("A", 1) => 2

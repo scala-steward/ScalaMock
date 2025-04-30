@@ -33,7 +33,21 @@ class StubbedIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R]
    *    } yield ()
    * }}}
    * */
+  @deprecated(
+    "Use `returnsIOWith`, `succeedsWith`, `raisesErrorWith` instead. Will be deleted in first release after 01.07.2025. This is needed to replace StubbedMethod0[R] with StubbedMethod[Unit, R]"
+  )
   def returnsIO(f: => R): IO[Unit] = IO(returns(f))
+
+  /** Allows to set result for method without arguments. Returns IO.
+   *
+   * {{{
+   *    for {
+   *      _ <- (() => foo.foo00()).returnsIOWith("result")
+   *      _ <- foo.fooIO.returnsIOWith(IO(1))
+   *    } yield ()
+   * }}}
+   * */
+  def returnsIOWith(value: => R): IO[Unit] = returnsIO(value)
 
   /** Allows to set result for method without arguments.
    *
@@ -44,6 +58,14 @@ class StubbedIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R]
    * */
   def returns(f: => R): Unit = delegate.returns(f)
 
+  /** Allows to set result for method without arguments.
+   *
+   * {{{
+   *    (() => foo.foo00()).returnsWith("result")
+   *    foo.fooIO.returnsWith(IO(1))
+   * }}}
+   * */
+  def returnsWith(f: => R): Unit = delegate.returnsWith(f)
 
   /** Allows to set success for method without arguments. Returns IO.
    *
@@ -54,7 +76,7 @@ class StubbedIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R]
    * }}}
    * */
   def succeedsWith[RR](value: => RR)(implicit ev: IO[RR] <:< R): IO[Unit] =
-    returnsIO(ev(IO(value)))
+    returnsIOWith(ev(IO(value)))
 
   /** Allows raise error for method without arguments. Returns IO.
    *
@@ -65,7 +87,7 @@ class StubbedIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R]
    * }}}
    * */
   def raisesErrorWith(ex: => Throwable)(implicit ev: IO[Nothing] <:< R): IO[Unit] =
-    returnsIO(ev(IO.raiseError(ex)))
+    returnsIOWith(ev(IO.raiseError(ex)))
 
   /** Allows to get number of times method was executed.
    *
@@ -151,6 +173,24 @@ class StubbedIOMethod[A, R](delegate: StubbedMethod[A, R]) extends StubbedMethod
    *  }}}
    * */
   def returnsIO(f: A => R): IO[Unit] = IO(returns(f))
+
+  /** Allows to set result for method with arguments. Returns IO
+   *
+   *  Scala 3
+   *  {{{
+   *   for
+   *     _ <- foo.bar.returnsIOWith(IO(1))
+   *   yield ()
+   *  }}}
+   *
+   *  Scala 2
+   *  {{{
+   *   for {
+   *     _ <- (foo.bar _).returnsIOWith(IO(1))
+   *   } yield ()
+   *  }}}
+   * */
+  def returnsIOWith(value: => R): IO[Unit] = returnsIO(_ => value)
 
   /** Allows to set success for method with arguments. Returns IO.
    *
@@ -268,6 +308,21 @@ class StubbedIOMethod[A, R](delegate: StubbedMethod[A, R]) extends StubbedMethod
    *  }}}
    * */
   def returns(f: A => R): Unit = delegate.returns(f)
+
+
+  /** Allows to set result for method with arguments.
+   *
+   * Scala 3
+   * {{{
+   *   foo.bar.returnsWith(IO(1))
+   * }}}
+   *
+   *  Scala 2
+   *  {{{
+   *   (foo.bar _).returnsWith(IO(1))
+   *   }}}
+   * */
+  def returnsWith(f: => R): Unit = delegate.returnsWith(f)
 
   /** Allows to get number of times method was executed.
    *

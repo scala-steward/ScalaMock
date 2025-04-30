@@ -17,12 +17,12 @@ class StubbedMethodSpec extends AnyFlatSpec with Matchers with Stubs:
 
   "StubbedMethod0" should "set the return value for a method without arguments" in:
     val testStub = stub[TestTrait0]
-    (() => testStub.noArgs).returns(42)
+    (() => testStub.noArgs).returnsWith(42)
     testStub.noArgs should be(42)
 
   it should "track the number of times a method was called" in:
     val testStub = stub[TestTrait0]
-    (() => testStub.noArgs).returns(42)
+    (() => testStub.noArgs).returnsWith(42)
     testStub.noArgs
     testStub.noArgs
     testStub.noArgs
@@ -30,7 +30,7 @@ class StubbedMethodSpec extends AnyFlatSpec with Matchers with Stubs:
 
   it should "work with methods that have parentheses" in:
     val testStub = stub[TestTrait0]
-    (() => testStub.noArgsString()).returns("test")
+    (() => testStub.noArgsString()).returnsWith("test")
     testStub.noArgsString() should be("test")
 
   "StubbedMethod" should "set the return value for a method with arguments" in:

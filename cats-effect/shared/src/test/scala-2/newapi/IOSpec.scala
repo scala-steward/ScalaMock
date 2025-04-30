@@ -34,7 +34,7 @@ class IOSpec extends CatsEffectSuite with CatsEffectStubs {
 
     val foo = stub[Foo]
     val result = for {
-      _ <- foo.zeroArgsIO.returnsIO(IO.none[String])
+      _ <- foo.zeroArgsIO.returnsIOWith(IO.none[String])
       _ <- foo.zeroArgsIO
       _ <- foo.zeroArgsIO
       _ <- foo.zeroArgsIO.timesIO

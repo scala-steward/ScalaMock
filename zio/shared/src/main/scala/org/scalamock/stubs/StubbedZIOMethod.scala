@@ -33,7 +33,21 @@ class StubbedZIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R
    *    } yield ()
    * }}}
    * */
+  @deprecated(
+    "Use `returnsZIOWith`, `succeedsWith`, `failsWith`, `diesWith` instead. Will be deleted in first release after 01.07.2025. This is needed to replace StubbedMethod0[R] with StubbedMethod[Unit, R]"
+  )
   def returnsZIO(f: => R): UIO[Unit] = ZIO.succeed(returns(f))
+
+  /** Allows to set result for method without arguments. Returns ZIO.
+   *
+   * {{{
+   *    for {
+   *      _ <- (() => foo.foo00()).returnsZIOWith("result")
+   *      _ <- foo.fooIO.returnsZIOWith(ZIO.succeed(1))
+   *    } yield ()
+   * }}}
+   * */
+  def returnsZIOWith(value: => R): UIO[Unit] = returnsZIO(value)
 
   /** Allows to set success for method without arguments. Returns ZIO.
    *
@@ -45,7 +59,7 @@ class StubbedZIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R
    * }}}
    * */
   def succeedsWith[RR](f: => RR)(implicit ev: IO[Nothing, RR] <:< R): UIO[Unit] =
-    returnsZIO(ev(ZIO.succeed(f)))
+    returnsZIOWith(ev(ZIO.succeed(f)))
 
   /** Allows set fail result for method without arguments. Returns ZIO.
    *
@@ -57,7 +71,7 @@ class StubbedZIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R
    * }}}
    * */
   def failsWith[RR](f: => RR)(implicit ev: IO[RR, Nothing] <:< R): UIO[Unit] =
-    returnsZIO(ev(ZIO.fail(f)))
+    returnsZIOWith(ev(ZIO.fail(f)))
 
   /** Allows set die result for method without arguments. Returns ZIO.
    *
@@ -69,7 +83,7 @@ class StubbedZIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R
    * }}}
    * */
   def diesWith(f: => Throwable)(implicit ev: UIO[Nothing] <:< R): UIO[Unit] =
-    ZIO.succeed(returns(ev(Exit.die(f))))
+    returnsZIOWith(ev(Exit.die(f)))
 
   /** Allows to get number of times method was executed. Returns ZIO
    *
@@ -90,7 +104,19 @@ class StubbedZIOMethod0[R](delegate: StubbedMethod0[R]) extends StubbedMethod0[R
    *   foo.fooIO.returns(ZIO.succeed(1))
    * }}}
    * */
+  @deprecated(
+    "Use `returnsWith` instead. Will be deleted in first release after 01.07.2025. This is needed to replace StubbedMethod0[R] with StubbedMethod[Unit, R]"
+  )
   def returns(f: => R): Unit = delegate.returns(f)
+
+  /** Allows to set result for method without arguments.
+   *
+   * {{{
+   *   (() => foo.foo00()).returnsWith("result")
+   *   foo.fooIO.returnsWith(ZIO.succeed(1))
+   * }}}
+   * */
+  def returnsWith(value: => R) = delegate.returnsWith(value)
 
   /** Allows to get number of times method was executed.
    *
@@ -167,6 +193,24 @@ class StubbedZIOMethod[A, R](delegate: StubbedMethod[A, R]) extends StubbedMetho
    *  }}}
    * */
   def returnsZIO(f: A => R): UIO[Unit] = ZIO.succeed(returns(f))
+
+  /** Allows to set result for method with arguments. Returns ZIO
+   *
+   * Scala 3
+   * {{{
+   *   for
+   *     _ <- foo.bar.returnsZIOWith(ZIO.succeed(1))
+   *   yield ()
+   *   }}}
+   *
+   *  Scala 2
+   *  {{{
+   *   for {
+   *     _ <- (foo.bar _).returnsZIOWith(ZIO.succeed(1))
+   *   } yield ()
+   * }}}
+   * */
+  def returnsZIOWith(value: => R): UIO[Unit] = returnsZIO(_ => value)
 
   /** Allows to set success for method with arguments. Returns ZIO
    *
@@ -308,6 +352,19 @@ class StubbedZIOMethod[A, R](delegate: StubbedMethod[A, R]) extends StubbedMetho
    *  }}}
    * */
   def returns(f: A => R): Unit = delegate.returns(f)
+
+  /** Allows to set result for method without arguments.
+   *
+   * Scala 3
+   * {{{
+   *   foo.bar.returnsWith(ZIO.succeed(1))
+   * }}}
+   * Scala 2
+   * {{{
+   *   (foo.bar _).returnsWith(ZIO.succeed(1))
+   * }}}
+   * */
+  def returnsWith(value: => R) = delegate.returnsWith(value)
 
   /** Allows to get number of times method was executed.
    *
