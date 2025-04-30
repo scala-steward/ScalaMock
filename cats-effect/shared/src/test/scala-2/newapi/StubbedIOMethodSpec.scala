@@ -20,7 +20,7 @@ class StubbedIOMethodSpec extends CatsEffectSuite with CatsEffectStubs {
   test("StubbedIOMethod0 - returnsIO should set the return value for a method without arguments") {
     val testStub = stub[TestTrait0]
     for {
-      _ <- testStub.noArgs.returnsIO(IO(42))
+      _ <- testStub.noArgs.returnsIOWith(IO(42))
       result <- testStub.noArgs
     } yield assertEquals(result, 42)
   }
@@ -45,7 +45,7 @@ class StubbedIOMethodSpec extends CatsEffectSuite with CatsEffectStubs {
   test("StubbedIOMethod0 - timesIO should return the number of times a method was called") {
     val testStub = stub[TestTrait0]
     for {
-      _ <- testStub.noArgs.returnsIO(IO(42))
+      _ <- testStub.noArgs.returnsIOWith(IO(42))
       _ <- testStub.noArgs
       _ <- testStub.noArgs
       _ <- testStub.noArgs

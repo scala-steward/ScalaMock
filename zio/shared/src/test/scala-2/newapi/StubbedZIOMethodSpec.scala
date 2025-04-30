@@ -24,7 +24,7 @@ object StubbedZIOMethodSpec extends ZIOSpecDefault with ZIOStubs {
         test("returnsZIO should set the return value for a method without arguments") {
           val testStub = stub[TestTrait0]
           for {
-            _ <- testStub.noArgs.returnsZIO(ZIO.succeed(42))
+            _ <- testStub.noArgs.returnsZIOWith(ZIO.succeed(42))
             result <- testStub.noArgs
           } yield assertTrue(result == 42)
         },
@@ -59,7 +59,7 @@ object StubbedZIOMethodSpec extends ZIOSpecDefault with ZIOStubs {
         test("timesZIO should return the number of times a method was called") {
           val testStub = stub[TestTrait0]
           for {
-            _ <- testStub.noArgs.returnsZIO(ZIO.succeed(42))
+            _ <- testStub.noArgs.returnsZIOWith(ZIO.succeed(42))
             _ <- testStub.noArgs
             _ <- testStub.noArgs
             _ <- testStub.noArgs

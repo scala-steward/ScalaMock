@@ -49,7 +49,12 @@ trait StubbedMethod0[R] extends StubbedMethod.Order {
    *    foo.foo00() // "abc"
    * }}}
    * */
+  @deprecated(
+    "Use `returnsWith` instead. Will be deleted in first release after 01.07.2025. This is needed to replace StubbedMethod0[R] with StubbedMethod[Unit, R]"
+  )
   def returns(f: => R): Unit
+  
+  def returnsWith(value: => R): Unit
 
   /** Allows to get number of times method was executed.
    *
@@ -120,7 +125,7 @@ trait StubbedMethod[A, R] extends StubbedMethod.Order {
    * }}}
    *
    * */
-  final def returnsWith(value: R): Unit = returns(_ => value)
+  def returnsWith(value: => R): Unit
 
   /** Allows to get number of times method was executed.
    *
@@ -289,8 +294,11 @@ object StubbedMethod {
     override def returns(f: A => R): Unit =
       resultRef.set(Some(f))
 
+    override def returnsWith(value: => R): Unit =
+      resultRef.set(Some(_ => value))
+
     override def returns(f: => R): Unit =
-      resultRef.set(Some(_ => f))
+      returnsWith(f)
 
     override def times: Int =
       callsRef.get().length

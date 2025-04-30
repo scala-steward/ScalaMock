@@ -53,7 +53,7 @@ object ZIOSpec extends ZIOSpecDefault, ZIOStubs:
     suite("check expectations with zio")(
       test("zero args"):
         for
-          _ <- foo.zeroArgsTask.returnsZIO(ZIO.none)
+          _ <- foo.zeroArgsTask.returnsZIOWith(ZIO.none)
           _ <- foo.zeroArgsTask.repeatN(10)
         yield assertTrue(foo.zeroArgsTask.times == 11),
       test("two args and cleanup"):
