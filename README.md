@@ -1,6 +1,6 @@
 ![GitHub Release](https://img.shields.io/github/v/release/scalamock/scalamock?color=blue])
 
-# What is ScalaMock?
+# scalamock
 
 ScalaMock is native Scala mocking framework.
 
