@@ -50,20 +50,6 @@ trait MockFactoryBase extends AbstractMockFactoryBase with MockContext {
     }
   }
 
-  override protected def inAnyOrder[T](what: => T): T = {
-    inContext(new UnorderedHandlers)(what)
-  }
-
-  override protected def inSequence[T](what: => T): T = {
-    inContext(new OrderedHandlers)(what)
-  }
-
-  override protected def inAnyOrderWithLogging[T](what: => T) =
-    inContext(new UnorderedHandlers(logging = true))(what)
-
-  override protected def inSequenceWithLogging[T](what: => T) =
-    inContext(new OrderedHandlers(logging = true))(what)
-
   // https://issues.scala-lang.org/browse/SI-5831
   implicit val _factory: MockFactoryBase = this
 
@@ -92,15 +78,6 @@ trait MockFactoryBase extends AbstractMockFactoryBase with MockContext {
 
     if (!oldExpectationContext.isSatisfied)
       reportUnsatisfiedExpectation(oldCallLog, oldExpectationContext)
-  }
-
-  private def inContext[T](context: Handlers)(what: => T): T = {
-    currentExpectationContext.add(context)
-    val prevContext = currentExpectationContext
-    currentExpectationContext = context
-    val r = what
-    currentExpectationContext = prevContext
-    r
   }
 
 }

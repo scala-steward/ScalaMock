@@ -1,4 +1,4 @@
-// Copyright (c) 2011-2015 ScalaMock Contributors (https://github.com/paulbutcher/ScalaMock/graphs/contributors)
+// Copyright (c) 2011-2025 ScalaMock Contributors (https://github.com/paulbutcher/ScalaMock/graphs/contributors)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,15 +18,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package org.scalamock
+package com.paulbutcher.test
 
-import org.scalamock.clazz.Mock
-import org.scalamock.context.MockContext
-import org.scalamock.function.MockFunctions
-import org.scalamock.matchers.Matchers
+import org.scalamock.scalatest.AsyncMockFactory
+import org.scalatest.flatspec.{AnyFlatSpec, AsyncFlatSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.{Assertion, OneInstancePerTest, Suite}
 
-/** ScalaMock public interface */
-trait AbstractMockFactoryBase extends Mock with MockFunctions with Matchers { this: MockContext =>
+import scala.concurrent.Future
 
-  protected def withExpectations[T](what: => T): T
+abstract class AsyncIsolatedSpec extends AsyncFlatSpec with AsyncMockFactory with Matchers with OneInstancePerTest {
+
+  def repeat(n: Int)(what: => Unit): Unit = {
+    for (i <- 0 until n)
+      what
+  }
+
+  def demandExpectationException(block: => Future[Any]): Future[Assertion] = {
+    recoverToSucceededIf[ExpectationException](withExpectations {
+      block
+    })
+  }
+
+  // made this method mandatory to override due to https://github.com/scalatest/scalatest/issues/965
+  override def newInstance: Suite with OneInstancePerTest
 }
