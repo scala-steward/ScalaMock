@@ -24,4 +24,4 @@ Dependencies for other build tools can be found at our website.
 
 ## Ask for help
 
-You can ask any question or discuss anything about scalamock in out discord channel on [business4s discord server](https://discord.gg/HRdHS4h9vq)
+You can ask any question or discuss anything about scalamock in our discord channel on [business4s discord server](https://discord.gg/HRdHS4h9vq)
