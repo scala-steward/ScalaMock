@@ -69,7 +69,11 @@ private[scalamock] class Utils(using val quotes: Quotes):
         con.appliedToArgss(
           constructorFields
             .map(_.map { sym => typeNames(sym.name).asType })
-            .map(_.map { case '[t] => '{ ${Expr.summon[Defaultable[t]].get}.default }.asTerm })
+            .map(_.map {
+              case '[t] => '{ ${ Expr.summon[Defaultable[t]].get }.default }.asTerm
+              // handles by-name constructor args
+              case _ => '{ null }.asTerm
+            })
         )
     end asParent
 
