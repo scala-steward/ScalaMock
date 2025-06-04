@@ -60,7 +60,12 @@ private[scalamock] class Utils(using val quotes: Quotes):
           @tailrec
           def collectTypes(tpe: TypeRepr, acc: Map[String, TypeRepr]): Map[String, TypeRepr] =
             tpe match
-              case MethodType(names, types, res) => collectTypes(res, acc ++ names.zip(types))
+              case MethodType(names, types, res) =>
+                val typesByValue = types.map {
+                  case n: ByNameType => n.widenByName
+                  case n => n
+                }
+                collectTypes(res, acc ++ names.zip(typesByValue))
               case tpe => acc
 
           collectTypes(con.tpe.widenTermRefByName, Map.empty)
@@ -68,11 +73,8 @@ private[scalamock] class Utils(using val quotes: Quotes):
 
         con.appliedToArgss(
           constructorFields
-            .map(_.map { sym => typeNames(sym.name) match {
-              case n: ByNameType => n.widenByName.asType
-              case n => n.asType
-            } })
-            .map(_.map { case '[t] => '{ ${ Expr.summon[Defaultable[t]].get }.default }.asTerm })
+            .map(_.map { sym => typeNames(sym.name).asType })
+            .map(_.map { case '[t] => '{ ${Expr.summon[Defaultable[t]].get}.default }.asTerm })
         )
     end asParent
 
