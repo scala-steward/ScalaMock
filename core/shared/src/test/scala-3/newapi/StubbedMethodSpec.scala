@@ -1,6 +1,6 @@
 package newapi
 
-import org.scalamock.stubs.{CallLog, Stubs, StubbedMethod, StubbedMethod0}
+import org.scalamock.stubs.{CallLog, Stubs, StubbedMethod}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
