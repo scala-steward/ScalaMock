@@ -97,16 +97,14 @@ trait ScalamockZIOSpec extends ScalamockZIOSpecSetup with ScalamockZIOSyntax {
     macro LayeredMockMacros.stubWithName[A]
 
   /**
-   * Documentation of the method in the ScalaMock section on the page https://scalamock.org/user-guide/ordering/
-   * (NOT ScalaMock 7!)
+   * Documentation: https://scalamock.org/classic/features#ordering
    */
   def inSequence[A](what: => A): Unit = {
     val _ = unsafeMockFactory.inSequence(what)
   }
 
   /**
-   * Documentation of the method in the ScalaMock section on the page https://scalamock.org/user-guide/ordering/
-   * (NOT ScalaMock 7!)
+   * Documentation: https://scalamock.org/classic/features#ordering
    */
   def inAnyOrder[A](what: => A): Unit = {
     val _ = unsafeMockFactory.inAnyOrder(what)
