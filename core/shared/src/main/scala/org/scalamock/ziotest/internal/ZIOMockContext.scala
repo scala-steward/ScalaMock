@@ -37,8 +37,8 @@ sealed trait ZIOMockContext {
   val mockContext: MockContext
   private[ziotest] def initializeExpectations(): UIO[Unit]
   private[ziotest] def verifyExpectations(): IO[ExpectationException, Unit]
-  private[ziotest] def inSequence[T](what: => T): T
-  private[ziotest] def inAnyOrder[T](what: => T): T
+  protected[ziotest] def inSequence[T](what: => T): T
+  protected[ziotest] def inAnyOrder[T](what: => T): T
 }
 
 object ZIOMockContext {
@@ -95,11 +95,11 @@ object ZIOMockContext {
 
     }
 
-    override private[ziotest] def inSequence[T](what: => T): T = {
+    override protected[ziotest] def inSequence[T](what: => T): T = {
       inContext(new OrderedHandlers)(what)
     }
 
-    override private[ziotest] def inAnyOrder[T](what: => T): T = {
+    override protected[ziotest] def inAnyOrder[T](what: => T): T = {
       inContext(new UnorderedHandlers)(what)
     }
 

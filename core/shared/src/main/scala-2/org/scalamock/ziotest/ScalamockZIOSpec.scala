@@ -99,14 +99,14 @@ trait ScalamockZIOSpec extends ScalamockZIOSpecSetup with ScalamockZIOSyntax {
   /**
    * Documentation: https://scalamock.org/classic/features#ordering
    */
-  def inSequence[A](what: => A): Unit = {
-    val _ = unsafeMockFactory.inSequence(what)
+  override def inSequence[A](what: => A): A = {
+    unsafeMockFactory.inSequence(what)
   }
 
   /**
    * Documentation: https://scalamock.org/classic/features#ordering
    */
-  def inAnyOrder[A](what: => A): Unit = {
-    val _ = unsafeMockFactory.inAnyOrder(what)
+  override def inAnyOrder[A](what: => A): A = {
+    unsafeMockFactory.inAnyOrder(what)
   }
 }
