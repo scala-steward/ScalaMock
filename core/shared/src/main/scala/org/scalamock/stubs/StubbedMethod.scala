@@ -83,6 +83,25 @@ trait StubbedMethod[A, R] {
    * */
   def returnsWith(value: => R): Unit
 
+  /** Allows to set result depending on call number starting from 1
+   *
+   * Scala 3
+   * {{{
+   *   foo.fooBar.returnsOnCall:
+   *     case 1 | 2 => "true"
+   *     case _ => "false
+   *   }}}
+   *  Scala 2
+   * {{{
+   *   (foo.fooBar _).returnsOnCall {
+   *     case 1 | 2 => "true"
+   *     case _ => "false
+   *   }
+   * }}}
+   *
+   * */
+  def returnsOnCall(f: Int => R): Unit
+
   /** Allows to get number of times method was executed.
    *
    *  Scala 3
@@ -248,6 +267,9 @@ object StubbedMethod {
 
     override def returnsWith(value: => R): Unit =
       resultRef.set(Some(_ => value))
+
+    override def returnsOnCall(f: Int => R): Unit =
+      resultRef.set(Some(_ => f(callsRef.get().length)))
 
     override def times: Int =
       callsRef.get().length

@@ -198,6 +198,48 @@ class StubbedIOMethod[A, R](delegate: StubbedMethod[A, R]) extends StubbedMethod
    * */
   def returnsWith(f: => R): Unit = delegate.returnsWith(f)
 
+  /** Allows to set result depending on call number starting from 1
+   *
+   * Scala 3
+   * {{{
+   *   foo.bar.returnsOnCall:
+   *     case 1 | 2 => IO(0)
+   *     case _ => IO(1)
+   *  }}}* Scala 2
+   * {{{
+   *   (foo.bar _).returnsOnCall {
+   *     case 1 | 2 => IO(0)
+   *     case _ => IO(1)
+   *   }
+   * }}}
+   *
+   * */
+  def returnsOnCall(f: Int => R): Unit = delegate.returnsOnCall(f)
+
+  /** Allows to set result depending on call number starting from 1. Returns IO
+   *
+   * Scala 3
+   * {{{
+   *   for
+   *     _ <- foo.bar.returnsIOOnCall:
+   *       case 1 | 2 => IO(0)
+   *       case _ => IO(1)
+   *   yield ()
+   *   }}}
+   * Scala 2
+   *
+   * {{{
+   *   for {
+   *     _ <- foo.bar.returnsIOOnCall {
+   *       case 1 | 2 => IO(0)
+   *       case _ => IO(1)
+   *     }
+   *   } yield ()
+   * }}}
+   *
+   * */
+  def returnsIOOnCall(f: Int => R): IO[Unit] = IO(delegate.returnsOnCall(f))
+
   /** Allows to get number of times method was executed.
    *
    *  Scala 3
