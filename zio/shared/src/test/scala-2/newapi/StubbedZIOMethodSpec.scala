@@ -118,7 +118,7 @@ object StubbedZIOMethodSpec extends ZIOSpecDefault with ZIOStubs {
         test("set result depending on number of call") {
           val testStub = stub[TestTraitWithArgs]
           for {
-            _ <- testStub.oneArg.returnsZIOOnCall {
+            _ <- (testStub.oneArg _).returnsZIOOnCall {
               case 1 => ZIO.succeed("test")
               case _ => ZIO.succeed("test2")
             }
