@@ -221,6 +221,48 @@ class StubbedZIOMethod[A, R](delegate: StubbedMethod[A, R]) extends StubbedMetho
    * */
   def returnsWith(value: => R) = delegate.returnsWith(value)
 
+  /** Allows to set result depending on call number starting from 1
+   *
+   * Scala 3
+   * {{{
+   *   foo.bar.returnsOnCall:
+   *     case 1 | 2 => ZIO.succeed(1)
+   *     case _ => ZIO.succeed(0)
+   *  }}}* Scala 2
+   * {{{
+   *   (foo.bar _).returnsOnCall {
+   *     case 1 | 2 => ZIO.succeed(1)
+   *     case _ => ZIO.succeed(0)
+   *   }
+   * }}}
+   *
+   * */
+  def returnsOnCall(f: Int => R): Unit = delegate.returnsOnCall(f)
+
+  /** Allows to set result depending on call number starting from 1. Returns ZIO
+   *
+   * Scala 3
+   * {{{
+   *   for
+   *     _ <- foo.bar.returnsZIOOnCall:
+   *       case 1 => ZIO.succeed(0)
+   *       case _ => ZIO.succeed(1)
+   *   yield ()  
+   *    }}}
+   * Scala 2
+   *
+   * {{{
+   *   for {
+   *     _ <- foo.bar.returnsZIOOnCall {
+   *       case 1 => ZIO.succeed(0)
+   *       case _ => ZIO.succeed(1)
+   *     }
+   *   } yield () 
+   * }}}
+   *
+   * */
+  def returnsZIOOnCall(f: Int => R): UIO[Unit] = ZIO.succeed(delegate.returnsOnCall(f))
+
   /** Allows to get number of times method was executed.
    *
    * {{{
