@@ -84,7 +84,8 @@ lazy val examples = project
     publish / skip := true,
     libraryDependencies ++= Seq(
       scalatest.value % Test,
-      specs2.value % Test
+      specs2.value % Test,
+      ziotest.value % Optional
     )
   ) dependsOn scalamock.jvm
 
