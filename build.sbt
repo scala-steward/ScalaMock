@@ -36,9 +36,7 @@ lazy val scalamock = crossProject(JSPlatform, JVMPlatform)
       Opts.doc.version(version.value) ++ Seq("-doc-root-content", "rootdoc.txt", "-version"),
     libraryDependencies ++= Seq(
       scalatest.value % Optional,
-      specs2.value % Optional,
-      ziotest.value % Optional,
-      "dev.zio" %%% "zio-test-sbt" % "2.1.19" % Test
+      specs2.value % Optional
     )
   )
 
@@ -52,7 +50,7 @@ lazy val `scalamock-zio` = crossProject(JSPlatform, JVMPlatform)
       val zioVersion = "2.1.19"
       Seq(
         "dev.zio" %%% "zio" % zioVersion,
-        "dev.zio" %%% "zio-test" % zioVersion % Test,
+        "dev.zio" %%% "zio-test" % zioVersion,
         "dev.zio" %%% "zio-test-sbt" % zioVersion % Test
       )
     }
@@ -86,8 +84,7 @@ lazy val examples = project
     publish / skip := true,
     libraryDependencies ++= Seq(
       scalatest.value % Test,
-      specs2.value % Test,
-      ziotest.value % Optional
+      specs2.value % Test
     )
   ) dependsOn scalamock.jvm
 
