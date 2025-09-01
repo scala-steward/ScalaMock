@@ -2,7 +2,6 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 lazy val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.19")
 lazy val specs2 = Def.setting("org.specs2" %%% "specs2-core" % "4.20.9")
-lazy val ziotest = Def.setting("dev.zio" %%% "zio-test" % "2.1.19")
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   /**
@@ -84,8 +83,7 @@ lazy val examples = project
     publish / skip := true,
     libraryDependencies ++= Seq(
       scalatest.value % Test,
-      specs2.value % Test,
-      ziotest.value % Optional
+      specs2.value % Test
     )
   ) dependsOn scalamock.jvm
 
