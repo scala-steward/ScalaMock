@@ -10,6 +10,13 @@ private[scalamock]
 class MakerUtils(using override val quotes: Quotes) extends Utils:
   import quotes.reflect.*
 
+  /**
+   *  To create mock object we should extend out T.
+   *  This method builds constructor with applied args
+   *  and returns correct parents of a trait and a class.
+   *  
+   *  Note that if T is a trait, we also should extend Object.
+   */
   def parentsOf[T: Type]: List[TypeTree | Term] =
     val tpe = TypeRepr.of[T]
     val isTrait = tpe.dealias.typeSymbol.flags.is(Flags.Trait)
@@ -64,9 +71,21 @@ class MakerUtils(using override val quotes: Quotes) extends Utils:
       List(asParent(TypeTree.of[T]), TypeTree.of[scala.reflect.Selectable])
   end parentsOf
 
+  /**
+   *  Loops through inlined method call to find mocked object and called method name.
+   *  Searches method info (MockableDefinition) through all relevant methods collected from TypeRepr.
+   * 
+   * @param term initial inlined method call, converted to function via ETA expansion
+   * @param argTypes provided function argument types without res type
+   * @param appliedTypes collected applied types, when method is generic
+   * @return StubWithMethod
+   */
   @experimental
   def searchTermWithMethod(term: Term, argTypes: List[TypeRepr], appliedTypes: List[TypeTree] = Nil): StubWithMethod =
     term match
+      case Select(apply @ Apply(term, _), "apply") if apply.tpe.isContextFunctionType =>
+        searchTermWithMethod(term, argTypes, appliedTypes)
+
       case Select(mock, methodName) =>
         val tpe =
           mock.tpe.widenTermRefByName match

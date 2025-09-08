@@ -55,6 +55,8 @@ private[stubs] class StubMaker(
       decls = classSymbol =>
         methods.flatMap { method =>
           List(
+            // Creates a field to store stubbed method representation
+            // val stub$<name>$<idx>: StubbedMethod.Internal[Any, Any]
             Symbol.newVal(
               parent = classSymbol,
               name = method.stubValName,
@@ -62,6 +64,8 @@ private[stubs] class StubMaker(
               flags = Flags.EmptyFlags,
               privateWithin = Symbol.noSymbol
             ),
+            // Creates an override for the val
+            // override val <name>: type
             if method.symbol.isValDef then
               Symbol.newVal(
                 parent = classSymbol,
@@ -71,6 +75,8 @@ private[stubs] class StubMaker(
                 privateWithin = Symbol.noSymbol
               )
             else
+              // Creates an implementation for the method, which will use StubbedMethod.Internal under the hood
+              // override def <name>(...args): type
               Symbol.newMethod(
                 parent = classSymbol,
                 name = method.symbol.name,
@@ -80,6 +86,8 @@ private[stubs] class StubMaker(
               ),
           )
         } ::: List(
+          // Creates a method to clear this stub
+          // def stub$macro$clear(): Unit
           Symbol.newMethod(
             parent = classSymbol,
             name = ClearStubsMethodName,
@@ -87,6 +95,8 @@ private[stubs] class StubMaker(
             flags = Flags.EmptyFlags,
             privateWithin = Symbol.noSymbol
           ),
+          // Creates a field to store unique index for this stub
+          // val stub$macro$idx: Int
           Symbol.newVal(
             parent = classSymbol,
             name = UniqueStubIdx,
@@ -102,6 +112,9 @@ private[stubs] class StubMaker(
       cls = classSymbol,
       parents = parents,
       body = List(
+        // Creates a method to clear this stub
+        // val stub$<name>$<idx>
+        // def stub$macro$clear(): Unit = stub$<name>$<idx>.clear()
         DefDef(
           symbol = classSymbol.methodMember(ClearStubsMethodName).head,
           _ =>
