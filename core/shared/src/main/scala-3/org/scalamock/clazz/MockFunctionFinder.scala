@@ -29,7 +29,7 @@ object MockFunctionFinder:
    */
   @scala.annotation.experimental
   def findMockFunction[M: Type](f: Expr[Any])(using quotes: Quotes): Expr[M] =
-    val utils = new Utils(using quotes)
+    val utils = MakerUtils(using quotes)
     import utils.quotes.reflect.*
     utils
       .searchTermWithMethod(f.asTerm, TypeRepr.of[M].typeArgs.init)
