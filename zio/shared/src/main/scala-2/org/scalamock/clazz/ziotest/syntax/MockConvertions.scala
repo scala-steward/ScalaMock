@@ -71,6 +71,7 @@ import org.scalamock.function.{
 }
 import org.scalamock.util.Defaultable
 import scala.language.experimental.macros
+import scala.language.implicitConversions
 
 // copy-paste only toMockFunctionX and toStubFunctionX from org.scalamock.clazz.Mock
 // methods mock and stub are not copied

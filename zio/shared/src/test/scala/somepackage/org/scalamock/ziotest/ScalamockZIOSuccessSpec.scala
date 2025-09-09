@@ -76,7 +76,7 @@ object ScalamockZIOSuccessSpec extends ScalamockZIOSpec {
             (mock.f _).expects(int(41).allowUnorderedCalls).returnsZIO("41")
           }
           actual <- ZIO.serviceWithZIO[Service](s => s.f(41).zip(s.f(42)))
-        } yield assertTrue(actual == ("41", "42"))
+        } yield assertTrue(actual == Tuple2("41", "42"))
       }.provide(mock[Service]),
       test("succeed if not all stub invocation were invoked") {
         for {
