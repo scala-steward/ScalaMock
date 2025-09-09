@@ -20,7 +20,6 @@
 
 package org.scalamock.ziotest
 
-import org.scalamock.ziotest.ScalamockZIOSpec
 import zio.test.{assertTrue, Assertion, Spec, TestAspectAtLeastR, TestEnvironment}
 import zio._
 import zio.internal.stacktracer.SourceLocation
