@@ -39,6 +39,8 @@ private[scalamock] class Utils(using val quotes: Quotes):
       }
 
   object MockableDefinitions:
+    private val objectMethods = TypeRepr.of[Object].typeSymbol.methodMembers.toSet
+
     @experimental
     def find(tpe: TypeRepr, name: String, paramTypes: List[TypeRepr], appliedTypes: List[TypeRepr]): MockableDefinition =
       def appliedTypesMatch(method: MockableDefinition, appliedTypes: List[TypeRepr]): Boolean =
@@ -58,9 +60,10 @@ private[scalamock] class Utils(using val quotes: Quotes):
 
 
     def apply(tpe: TypeRepr): List[MockableDefinition] =
-      val methods = (tpe.typeSymbol.methodMembers.toSet -- TypeRepr.of[Object].typeSymbol.methodMembers).toList
+      val methods = tpe.typeSymbol.methodMembers
         .filter(sym =>
-          !sym.flags.is(Flags.Private) &&
+          !objectMethods.contains(sym) &&
+            !sym.flags.is(Flags.Private) &&
             !sym.flags.is(Flags.Final) &&
             !sym.flags.is(Flags.Mutable) &&
             !sym.flags.is(Flags.Artifact) &&
