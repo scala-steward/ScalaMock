@@ -47,13 +47,14 @@ private[clazz] object MockMaker:
       },
       decls = classSymbol => createDefaultMockNameSymbol(classSymbol) :: mockableDefinitions.flatMap { definition =>
         val mockFunctionClassSym =
-          Symbol.classSymbol(s"org.scalamock.function.${mockType}Function${definition.parameterTypes.length}")
+          Symbol.classSymbol(s"org.scalamock.function.${mockType}Function${definition.rawTypes.length}")
 
         val mockFunctionSym =
           Symbol.newVal(
             parent = classSymbol,
             name = definition.mockValName,
-            tpe = TypeTree.ref(mockFunctionClassSym).tpe.appliedTo(definition.prepareTypesFor(classSymbol).map(_.tpe)),
+            tpe = TypeTree.ref(mockFunctionClassSym).tpe
+              .appliedTo(List.fill(definition.rawTypes.length + 1)(TypeRepr.of[Any])),
             flags = Flags.EmptyFlags,
             privateWithin = Symbol.noSymbol
           )
@@ -125,7 +126,7 @@ private[clazz] object MockMaker:
                       New(TypeIdent(mockFunctionClassSymbol)),
                       mockFunctionClassSymbol.primaryConstructor
                     ),
-                    definition.prepareTypesFor(classSymbol)
+                    List.fill(definition.rawTypes.length + 1)(TypeTree.of[Any])
                   ),
                   List(ctx.asTerm, mockFunctionUniqueName.asTerm)
                 )

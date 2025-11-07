@@ -43,21 +43,72 @@ private[scalamock] class Utils(using val quotes: Quotes):
 
     @experimental
     def find(tpe: TypeRepr, name: String, paramTypes: List[TypeRepr], appliedTypes: List[TypeRepr]): MockableDefinition =
-      def appliedTypesMatch(method: MockableDefinition, appliedTypes: List[TypeRepr]): Boolean =
-        method.tpe match
-          case poly: PolyType => poly.paramTypes.lengthCompare(appliedTypes) == 0
-          case _ => appliedTypes.isEmpty
-
-      def typesMatch(method: MockableDefinition, paramTypes: List[TypeRepr]): Boolean =
-        paramTypes.lengthCompare(method.parameterTypes) == 0 &&
-          paramTypes.zip(method.parameterTypes).forall(_ <:< _)
-
       MockableDefinitions(tpe)
-        .filter(m => m.symbol.name == name && typesMatch(m, paramTypes) && appliedTypesMatch(m, appliedTypes))
-        .sortWith((a, b) => a.parameterTypes.zip(b.parameterTypes).forall(_ <:< _))
+        .filter { method =>
+          // should have same name
+          method.symbol.name == name &&
+          // should have same parameter count
+          paramTypes.lengthCompare(method.rawTypes) == 0 &&
+          // only poly should have appliedTypes
+          (method.tpe match {
+            case poly: PolyType => poly.paramTypes.lengthCompare(appliedTypes.length) == 0
+            case _ => appliedTypes.isEmpty
+          }) &&
+            // params with filled ParamRef and few fixes should match
+            paramTypes.zip(method.rawTypes.map(adjustTpe(_, method.tpe, appliedTypes))).forall(_ <:< _)
+        }
+        .sortWith((a, b) => a.rawTypes.zip(b.rawTypes).forall(_ <:< _))
         .headOption
         .getOrElse(report.errorAndAbort(s"Method with such signature not found"))
 
+    private def adjustTpe(tpe: TypeRepr, methodTpe: TypeRepr, appliedTypes: List[TypeRepr]): TypeRepr =
+      def updateParamRefs(tpe: TypeRepr, methodTpe: PolyType): TypeRepr =
+        def replace(ref: ParamRef): TypeRepr =
+          if appliedTypes.length > ref.paramNum then appliedTypes(ref.paramNum)
+          else if methodTpe.paramBounds.length > ref.paramNum then methodTpe.paramBounds(ref.paramNum).hi
+          else TypeRepr.of[Any]
+
+        tpe match {
+          case p@ParamRef(binder, idx) =>
+            replace(p)
+
+          case AppliedType(tycon: ParamRef, args) =>
+            replace(tycon).appliedTo(args.map(updateParamRefs(_, methodTpe)))
+
+          case TypeRef(p: ParamRef, name) =>
+            replace(p).typeSymbol.typeMember(name).typeRef
+
+          case AppliedType(TypeRef(tycon: ParamRef, name), args) =>
+            replace(tycon).typeSymbol.typeMember(name).typeRef.appliedTo(args.map(updateParamRefs(_, methodTpe)))
+
+          case AppliedType(tycon, args) =>
+            tycon.appliedTo(args.map(updateParamRefs(_, methodTpe)))
+
+          case AndType(left, right) =>
+            AndType(updateParamRefs(left, methodTpe), updateParamRefs(right, methodTpe))
+
+          case OrType(left, right) =>
+            OrType(updateParamRefs(left, methodTpe), updateParamRefs(right, methodTpe))
+
+          case _ =>
+            tpe
+        }
+      end updateParamRefs
+
+      val preprocessed = tpe match
+        case ByNameType(tpe) =>
+          tpe
+        case AppliedType(TypeRef(_, "<repeated>"), elemTyps) =>
+          TypeRepr.typeConstructorOf(classOf[Seq[?]]).appliedTo(elemTyps)
+        case tpe =>
+          tpe
+
+      methodTpe match
+        case poly: PolyType =>
+          updateParamRefs(preprocessed, poly)
+        case _ =>
+          preprocessed
+    end adjustTpe
 
     def apply(tpe: TypeRepr): List[MockableDefinition] =
       val methods = tpe.typeSymbol.methodMembers
@@ -93,7 +144,6 @@ private[scalamock] class Utils(using val quotes: Quotes):
     val stubValName = s"stub$$${symbol.name}$$$idx"
     val tpe = ownerTpe.memberType(symbol)
     val (rawTypes, rawResType) = tpe.widen.collectTypes
-    @experimental val parameterTypes = prepareTypesFor(ownerTpe.typeSymbol).map(_.tpe).init
 
     @experimental
     private def thisTypeOverride(where: TypeRepr, classSymbol: Symbol): TypeRepr =
@@ -122,10 +172,10 @@ private[scalamock] class Utils(using val quotes: Quotes):
         loop(tpe, Nil)
 
       val pathDependentTypes = types.flatMap(collectInnerTypes(_, ownerTpe.typeSymbol))
-      val pdUpdated = pathDependentTypes.map(innerTypeOverride(_, ownerTpe.typeSymbol, classSymbol, applyTypes = false))
+      val pdUpdated = pathDependentTypes.map(innerTypeOverride(_, ownerTpe.typeSymbol, classSymbol))
       where.substituteTypes(pathDependentTypes.map(_.typeSymbol), pdUpdated)
 
-    private def innerTypeOverride(tpe: TypeRepr, ownerSymbol: Symbol, newOwnerSymbol: Symbol, applyTypes: Boolean): TypeRepr =
+    private def innerTypeOverride(tpe: TypeRepr, ownerSymbol: Symbol, newOwnerSymbol: Symbol): TypeRepr =
       @tailrec
       def loop(currentTpe: TypeRepr, names: List[(String, List[TypeRepr])], appliedTypes: List[TypeRepr]): TypeRepr =
         currentTpe match
@@ -134,9 +184,7 @@ private[scalamock] class Utils(using val quotes: Quotes):
 
           case TypeRef(inner, name) if name == ownerSymbol.name && names.nonEmpty =>
             names.foldLeft[TypeRepr](This(newOwnerSymbol).tpe) { case (tpe, (name, appliedTypes)) =>
-              tpe
-                .select(tpe.typeSymbol.typeMember(name))
-                .appliedTo(appliedTypes.filter(_ => applyTypes))
+              tpe.select(tpe.typeSymbol.typeMember(name))
             }
 
           case TypeRef(inner, name) =>
@@ -192,48 +240,3 @@ private[scalamock] class Utils(using val quotes: Quotes):
         case _ =>
           resType
     }
-
-    @experimental
-    def prepareTypesFor(classSymbol: Symbol): List[TypeTree] = (rawTypes :+ thisTypeOverride(rawResType, classSymbol))
-      .map(innerTypeOverride(_, ownerTpe.typeSymbol, classSymbol, applyTypes = true))
-      .map(tpe => adjustTpe(tpe).asType match { case '[t] => TypeTree.of[t] })
-
-    private def adjustTpe(tpe: TypeRepr): TypeRepr =
-      def mapParamRefWithWildcard(tpe: TypeRepr): TypeRepr =
-        tpe match
-          case ParamRef(PolyType(_, bounds, _), idx) =>
-            bounds(idx)
-          case AppliedType(tycon, args) =>
-            tycon.appliedTo(args.map(mapParamRefWithWildcard))
-          case _ =>
-            tpe
-
-      @tailrec
-      def resolveAndOrTypeParamRefs(tpe: TypeRepr): TypeRepr =
-        tpe match {
-          case AndType(left@(_: ParamRef | _: AppliedType), right@(_: ParamRef | _: AppliedType)) =>
-            TypeRepr.of[Any]
-          case AndType(left@(_: ParamRef | _: AppliedType), right) =>
-            resolveAndOrTypeParamRefs(right)
-          case AndType(left, right@(_: ParamRef | _: AppliedType)) =>
-            resolveAndOrTypeParamRefs(left)
-          case OrType(_: ParamRef | _: AppliedType, _) =>
-            TypeRepr.of[Any]
-          case OrType(_, _: ParamRef | _: AppliedType) =>
-            TypeRepr.of[Any]
-          case other =>
-            other
-        }
-
-
-      resolveAndOrTypeParamRefs(mapParamRefWithWildcard(tpe.widen)) match
-        case TypeBounds(lower, upper) => upper
-        case AppliedType(TypeRef(_, "<repeated>"), elemTyps) =>
-          TypeRepr.typeConstructorOf(classOf[Seq[?]]).appliedTo(elemTyps)
-        case TypeRef(_: ParamRef, _) =>
-          TypeRepr.of[Any]
-        case AppliedType(TypeRef(_: ParamRef, _), _) =>
-          TypeRepr.of[Any]
-        case other =>
-          other
-    end adjustTpe
