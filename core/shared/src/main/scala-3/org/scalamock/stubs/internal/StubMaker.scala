@@ -192,6 +192,8 @@ private[stubs] class StubMaker(
     acc: mutable.ListBuffer[TypeRepr] = new ListBuffer[TypeRepr]
   ): List[TypeRepr] =
     tpe.asType match
+      case _ if acc.length > 1000 =>
+        report.errorAndAbort("Infinite loop occurred. Provide type arguments explicitly")
       case '[h *: t] =>
         tupleTypeToList(TypeRepr.of[t], acc += TypeRepr.of[h])
       case '[EmptyTuple] =>

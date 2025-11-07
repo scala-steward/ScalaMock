@@ -12,6 +12,19 @@ import scala.util.{Failure, Try}
 class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
 
 
+  it("work with methods having HKT parameters") {
+
+    trait HKT:
+      def hkt[F[_], V](data: F[V]): Unit
+
+    val hkt = stub[HKT]
+    hkt.hkt[List, Int].returnsWith(())
+
+    hkt.hkt[List, Int](List(1, 2, 3))
+
+    hkt.hkt[List, Int].calls shouldBe List(List(1, 2, 3))
+  }
+  
   it("compile type aliases") {
     trait Aliased[A, B]
 
