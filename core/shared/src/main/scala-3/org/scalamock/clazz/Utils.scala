@@ -69,7 +69,10 @@ private[scalamock] class Utils(using val quotes: Quotes):
           else TypeRepr.of[Any]
 
         tpe match {
-          case p@ParamRef(binder, idx) =>
+          case TypeBounds(lo, hi) =>
+            TypeBounds(updateParamRefs(lo, methodTpe), updateParamRefs(hi, methodTpe))
+            
+          case p: ParamRef =>
             replace(p)
 
           case AppliedType(tycon: ParamRef, args) =>
