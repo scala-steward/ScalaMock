@@ -24,6 +24,23 @@ class NewApiSpec extends AnyFunSpec, Matchers, Stubs:
 
     hkt.hkt[List, Int].calls shouldBe List(List(1, 2, 3))
   }
+
+  it("replace param refs in type bounds") {
+
+    trait X[T]
+
+    class XInt extends X[Int]
+
+    trait A {
+      def f2[T](t: X[? <: T]): Unit
+      def f3[A, B](t: X[? >: A <: B]): Unit
+    }
+    
+    val a = stub[A]
+    
+    a.f2[Int].calls.length
+    a.f3[Int, Int].calls.length
+  }
   
   it("compile type aliases") {
     trait Aliased[A, B]
