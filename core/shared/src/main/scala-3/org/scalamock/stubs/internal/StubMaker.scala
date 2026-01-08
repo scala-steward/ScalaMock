@@ -70,7 +70,7 @@ private[stubs] class StubMaker(
               Symbol.newVal(
                 parent = classSymbol,
                 name = method.symbol.name,
-                tpe = method.tpeOverride(classSymbol),
+                tpe = This(classSymbol).tpe.memberType(method.symbol),
                 flags = Flags.Override,
                 privateWithin = Symbol.noSymbol
               )
@@ -80,7 +80,7 @@ private[stubs] class StubMaker(
               Symbol.newMethod(
                 parent = classSymbol,
                 name = method.symbol.name,
-                tpe = method.tpeOverride(classSymbol),
+                tpe = This(classSymbol).tpe.memberType(method.symbol),
                 flags = Flags.Override,
                 privateWithin = Symbol.noSymbol
               ),

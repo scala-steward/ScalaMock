@@ -64,7 +64,7 @@ private[clazz] object MockMaker:
             Symbol.newVal(
               parent = classSymbol,
               name = definition.symbol.name,
-              tpe = definition.tpeOverride(classSymbol),
+              tpe = This(classSymbol).tpe.memberType(definition.symbol),
               flags = Flags.Override,
               privateWithin = Symbol.noSymbol
             )
@@ -72,7 +72,7 @@ private[clazz] object MockMaker:
             Symbol.newMethod(
               parent = classSymbol,
               name = definition.symbol.name,
-              tpe = definition.tpeOverride(classSymbol),
+              tpe = This(classSymbol).tpe.memberType(definition.symbol),
               flags = Flags.Override,
               privateWithin = Symbol.noSymbol
             )
@@ -145,7 +145,7 @@ private[clazz] object MockMaker:
                       Select.unique(
                         Apply(
                           Select.unique(Ref(mockFunctionValDef.symbol), "apply"),
-                          args.flatten.collect { case t: Term => Select.unique(t, "asInstanceOf") }
+                          args.flatten.collect { case t: Term => t }
                         ),
                         "asInstanceOf"
                       ),
