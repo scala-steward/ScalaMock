@@ -4,8 +4,24 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-class   Scala3Spec extends AnyFunSpec with MockFactory with Matchers {
+class Scala3Spec extends AnyFunSpec with MockFactory with Matchers {
 
+  it("mock refinement types") {
+    """
+      |trait Effect:
+      |  type Address[_ <: String]
+      |  type NetworkError <: Throwable
+      |  type Id
+      |
+      |  def getId[P <: String](address: Address[P]): Id
+      |  def reachablePeersOf[P <: String](peerRepr: String): Set[Address[P]]
+      |
+      |  type IntNetwork = Effect {type Id = Int; type NetworkError = Throwable; type Address[P <: String] = String}
+      |
+      |  val netEffect = stub[IntNetwork]
+      |""".stripMargin should compile
+
+  }
 
   it("mock traits with parameters") {
     trait Test(val a: Int) {
