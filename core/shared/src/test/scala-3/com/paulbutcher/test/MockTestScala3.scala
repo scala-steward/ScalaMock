@@ -37,6 +37,16 @@ class MockTestScala3 extends AnyFreeSpec with MockFactory with Matchers {
       "mock[WithTC[ID]]" should compile
     }
 
+
+    "mock iterables and builders" in {
+      "mock[scala.collection.mutable.Builder[String, Unit]]" should compile
+      """
+        |val m = mock[Iterable[Int]]
+        |m.collect.expects(*).returns(Iterable.single(1))
+        |m.collect(_ => 2) shouldBe Iterable.single(1)
+        |""".stripMargin should compile
+    }
+
     "mock generic arguments" in {
       class WithGeneric[T](t: T)
       "mock[WithGeneric[String]]" should compile
