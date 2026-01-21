@@ -18,10 +18,13 @@ class ByNameParametersTest extends AnyFreeSpec with MockFactory with Matchers {
     }
   }
 
-  //! TODO - find a way to make this less ugly
   "match methods with by name parameters" in {
     withExpectations {
-      val m = mock[TestTrait]
+      trait ByNameParam {
+        def byNameParam(x: => Int): String
+      }
+
+      val m = mock[ByNameParam]
       val f: (=> Int) => Boolean = { x => x == 1 && x == 2  }
       ((m.byNameParam _): (=> Int) => String).expects(new FunctionAdapter1(f)).returning("it works")
       var y = 0

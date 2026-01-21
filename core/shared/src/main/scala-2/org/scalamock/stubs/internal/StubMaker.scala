@@ -38,7 +38,6 @@ class StubMaker[C <: Context](val ctx: C) {
     val utils = new MacroUtils[ctx.type](ctx)
 
     import utils._
-    import Flag._
     import definitions._
 
     def isPathDependentThis(t: Type): Boolean = t match {
@@ -48,100 +47,85 @@ class StubMaker[C <: Context](val ctx: C) {
     }
 
     /**
+     * Checks if a type is a ThisType that refers to the type being mocked.
+     */
+    def isThisType(t: Type): Boolean = t match {
+      case ThisType(tpe) => tpe == typeToMock.typeSymbol
+      case _ => false
+    }
+
+    /**
       * Translates forwarder parameters into Trees.
-      * Also maps Java repeated params into Scala repeated params
+      * Also maps Java repeated params into Scala repeated params.
+      * Also handles path-dependent this types in type arguments.
       */
     def forwarderParamType(t: Type): Tree = t match {
       case TypeRef(pre, sym, args) if sym == JavaRepeatedParamClass =>
         TypeTree(internalTypeRef(pre, RepeatedParamClass, args))
-      case TypeRef(pre, sym, args) if isPathDependentThis(t) =>
-        AppliedTypeTree(Ident(TypeName(sym.name.toString)), args map TypeTree _)
-      case _ =>
-        TypeTree(t)
-    }
-
-    /**
-     *  Translates mock function parameters into Trees.
-     *  The difference between forwarderParamType is that:
-     *  T* and T... are translated into Seq[T]
-     *
-     *  see issue #24
-     */
-    def mockParamType(t: Type): Tree = t match {
-      case TypeRef(pre, sym, args) if sym == JavaRepeatedParamClass || sym == RepeatedParamClass =>
-        AppliedTypeTree(Ident(typeOf[Seq[_]].typeSymbol), args map TypeTree _)
-      case TypeRef(pre, sym, args) if isPathDependentThis(t) =>
-        AppliedTypeTree(Ident(TypeName(sym.name.toString)), args map TypeTree _)
+      case TypeRef(_, sym, args) if isPathDependentThis(t) =>
+        AppliedTypeTree(Ident(TypeName(sym.name.toString)), args.map(forwarderParamType))
+      case TypeRef(_, sym, args) if args.exists(arg => isThisType(arg) || arg.exists(isThisType)) =>
+        AppliedTypeTree(Ident(sym), args.map(forwarderParamType))
+      case t if isThisType(t) =>
+        SingletonTypeTree(This(TypeName("")))
       case _ =>
         TypeTree(t)
     }
 
     def methodsNotInObject =
-      typeToMock.members filter (m => m.isMethod && !isMemberOfObject(m)) map (_.asMethod)
+      typeToMock.members
+        .filter(m => m.isMethod && !isMemberOfObject(m))
+        .map(_.asMethod)
 
-    //! TODO - This is a hack, but it's unclear what it should be instead. See
-    //! https://groups.google.com/d/topic/scala-user/n11V6_zI5go/discussion
-    def resolvedType(m: Symbol): Type =
-      m.typeSignatureIn(internalSuperType(internalThisType(typeToMock.typeSymbol), typeToMock))
-
-    def buildForwarderParams(methodType: Type) =
-      paramss(methodType) map { params =>
-        params map { p =>
-          ValDef(
-            Modifiers(PARAM | (if (p.isImplicit) IMPLICIT else NoFlags)),
-            TermName(p.name.toString),
-            forwarderParamType(p.typeSignature),
-            EmptyTree)
-        }
-      }
-
-    // def <|name|>(p1: T1, p2: T2, ...): T = <|mockname|>(p1, p2, ...)
-    def methodDef(m: MethodSymbol, methodType: Type, body: Tree): DefDef = {
-      val params = buildForwarderParams(methodType)
-      val resType = forwarderParamType(finalResultType(methodType))
-
-      DefDef(
-        Modifiers(OVERRIDE),
-        m.name,
-        m.typeParams map { p => internalTypeDef(p) },
-        params,
-        resType,
-        body
-      )
-    }
-
-    def methodImpl(m: MethodSymbol, methodType: Type, body: Tree): DefDef = {
-      methodType match {
-        case NullaryMethodType(_) => methodDef(m, methodType, body)
-        case MethodType(_, _) => methodDef(m, methodType, body)
-        case PolyType(_, _) => methodDef(m, methodType, body)
-        case _ => ctx.abort(ctx.enclosingPosition,
-          s"ScalaMock: Don't know how to handle ${methodType.getClass}. Please open a ticket at https://github.com/paulbutcher/ScalaMock/issues")
+    def wrapByNameParam(p: Symbol): Tree = {
+      val ident = Ident(TermName(p.name.toString))
+      p.typeSignature match {
+        case TypeRef(_, sym, _) if sym == definitions.ByNameParamClass =>
+          q"() => $ident"
+        case _ =>
+          ident
       }
     }
 
     def forwarderImpl(m: MethodSymbol): ValOrDefDef = {
-      val mt = resolvedType(m)
-      if (m.isStable) {
+      val mt = m.typeSignatureIn(
+        internal.superType(internal.thisType(typeToMock.typeSymbol), typeToMock)
+      )
+      val resType = forwarderParamType(finalResultType(mt))
+
+      if (m.isVal) {
         ValDef(
-          Modifiers(),
-          TermName(m.name.toString),
-          TypeTree(mt),
-          castTo(literal(null), mt))
-      } else {
-        val args = paramss(mt).flatten map { p => Ident(TermName(p.name.toString)) }
-        val body = applyListOn(
-          Select(This(anon), mockFunctionName(m)),
-          "impl",
-          List(tupledArgs(args))
+          Modifiers(Flag.OVERRIDE),
+          m.name,
+          resType,
+          q"null.asInstanceOf[$resType]"
         )
-        methodImpl(m, mt, body)
+      } else {
+        // def <|name|>(p1: T1, p2: T2, ...): T = <|mockname|>(p1, p2, ...)
+        DefDef(
+          Modifiers(Flag.OVERRIDE),
+          m.name,
+          mt.typeParams.map(internal.typeDef),
+          paramss(mt).map(_.map { p =>
+            ValDef(
+              Modifiers(Flag.PARAM | (if (p.isImplicit) Flag.IMPLICIT else NoFlags)),
+              TermName(p.name.toString),
+              forwarderParamType(p.typeSignature),
+              EmptyTree
+            )
+          }),
+          resType,
+          q"""
+           ${mockFunctionName(m)}
+             .impl(${tupledArgs(paramss(mt).flatten.map(wrapByNameParam))})
+             .asInstanceOf[$resType]
+          """
+        )
       }
     }
 
     def mockFunctionName(m: MethodSymbol) = {
-      val method = typeToMock.member(m.name).asTerm
-      val index = method.alternatives.indexOf(m)
+      val index = typeToMock.member(m.name).asTerm.alternatives.indexOf(m)
       assert(index >= 0)
       TermName("stub$" + m.name + "$" + index)
     }
@@ -174,51 +158,8 @@ class StubMaker[C <: Context](val ctx: C) {
         case _ => ctx.abort(ctx.enclosingPosition, "ScalaMock: Can't handle methods with more than 22 parameters (yet)")
       }
 
-    def tupledType(args: List[Tree]): Tree = {
-      args match {
-        case Nil => TypeTree(typeOf[Unit])
-        case head :: Nil => head
-        case nonEmptyArgs =>
-          val typeSymbolOfTuple = nonEmptyArgs.length match {
-            case 2 => typeOf[Tuple2[_, _]].typeSymbol
-            case 3 => typeOf[Tuple3[_, _, _]].typeSymbol
-            case 4 => typeOf[Tuple4[_, _, _, _]].typeSymbol
-            case 5 => typeOf[Tuple5[_, _, _, _, _]].typeSymbol
-            case 6 => typeOf[Tuple6[_, _, _, _, _, _]].typeSymbol
-            case 7 => typeOf[Tuple7[_, _, _, _, _, _, _]].typeSymbol
-            case 8 => typeOf[Tuple8[_, _, _, _, _, _, _, _]].typeSymbol
-            case 9 => typeOf[Tuple9[_, _, _, _, _, _, _, _, _]].typeSymbol
-            case 10 => typeOf[Tuple10[_, _, _, _, _, _, _, _, _, _]].typeSymbol
-            case 11 => typeOf[Tuple11[_, _, _, _, _, _, _, _, _, _, _]].typeSymbol
-            case 12 => typeOf[Tuple12[_, _, _, _, _, _, _, _, _, _, _, _]].typeSymbol
-            case 13 => typeOf[Tuple13[_, _, _, _, _, _, _, _, _, _, _, _, _]].typeSymbol
-            case 14 => typeOf[Tuple14[_, _, _, _, _, _, _, _, _, _, _, _, _, _]].typeSymbol
-            case 15 => typeOf[Tuple15[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _]].typeSymbol
-            case 16 => typeOf[Tuple16[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]].typeSymbol
-            case 17 => typeOf[Tuple17[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]].typeSymbol
-            case 18 => typeOf[Tuple18[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]].typeSymbol
-            case 19 => typeOf[Tuple19[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]].typeSymbol
-            case 20 => typeOf[Tuple20[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]].typeSymbol
-            case 21 => typeOf[Tuple21[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]].typeSymbol
-            case 22 => typeOf[Tuple22[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]].typeSymbol
-            case _ =>
-              ctx.abort(ctx.enclosingPosition, "ScalaMock: Can't handle methods with more than 22 parameters (yet)")
-          }
-          AppliedTypeTree(Ident(typeSymbolOfTuple), nonEmptyArgs)
-      }
-    }
-
-
-    // val stub$<methodName>$<idx> = new StubApi.Internal[(T1, T2, ...), R]
-
     def mockMethod(m: MethodSymbol): ValDef = {
-      val mt = resolvedType(m)
-      val clazz = typeOf[StubbedMethod.Internal[_, _]]
-      val finalRt = finalResultType(mt)
-      val types = List(
-        tupledType(paramTypes(mt).map(mockParamType)),
-        mockParamType(finalRt)
-      )
+      val finalRt = finalResultType(m.typeSignature)
       val termName = mockFunctionName(m)
       val additionalAnnotations = if(isScalaJs) List(jsExport(termName.encodedName.toString)) else Nil
       val summonedLog = ctx.inferImplicitValue(typeOf[CallLog], silent = true)
@@ -229,10 +170,10 @@ class StubMaker[C <: Context](val ctx: C) {
         }
       ValDef(
         Modifiers().mapAnnotations(additionalAnnotations ::: _),
-        mockFunctionName(m),
-        AppliedTypeTree(Ident(clazz.typeSymbol), types), // see issue #24
+        termName,
+        TypeTree(typeOf[StubbedMethod.Internal[Any, Any]]),
         callConstructor(
-          New(AppliedTypeTree(Ident(clazz.typeSymbol), types)),
+          New(TypeTree(typeOf[StubbedMethod.Internal[Any, Any]])),
           generateMockMethodName(m, m.typeSignature),
           if (summonedLog == EmptyTree) q"None" else q"Some($summonedLog)",
           summonedIOOpt.fold(q"None": Tree)(io => q"Some($io)"),
@@ -251,7 +192,7 @@ class StubMaker[C <: Context](val ctx: C) {
         List(List()),
         TypeTree(typeOf[Unit]),
         Block(
-          methods.map(mockFunctionName(_))
+          methods.map(mockFunctionName)
             .map { name => Apply(Select(Select(This(anon), name), TermName("clear")), Nil) },
           q"()"
         )
@@ -283,10 +224,9 @@ class StubMaker[C <: Context](val ctx: C) {
         }
       }
 
-      val tnEmpty = TypeName("") // typeNames.EMPTY
-      val tnConstructor = TermName("<init>") // termNames.CONSTRUCTOR
-      val superCall: Tree = Select(Super(This(tnEmpty), tnEmpty), tnConstructor)
-      val constructorCall = constructorArgumentsTypes.fold(Apply(superCall, Nil).asInstanceOf[Tree]) { symbols =>
+      val superCall: Tree = Select(Super(This(typeNames.EMPTY), typeNames.EMPTY), termNames.CONSTRUCTOR)
+      val constructorCall = constructorArgumentsTypes
+        .fold(Apply(superCall, Nil).asInstanceOf[Tree]) { symbols =>
         symbols.foldLeft(superCall) {
           case (acc, symbol) => Apply(acc, symbol.map(tpe => q"null.asInstanceOf[$tpe]"))
         }
@@ -294,7 +234,7 @@ class StubMaker[C <: Context](val ctx: C) {
 
       DefDef(
         Modifiers(),
-        tnConstructor,
+        termNames.CONSTRUCTOR,
         List(),
         List(List()),
         TypeTree(),
@@ -327,28 +267,35 @@ class StubMaker[C <: Context](val ctx: C) {
     }
 
     // new <|typeToMock|> { <|members|> }
-    def anonClass(members: List[Tree]) =
+    def anonClass(members: List[Tree]) = {
+      val isTrait = typeToMock.typeSymbol.asInstanceOf[reflect.internal.HasFlags].isTrait
       Block(
         List(
           ClassDef(
-            Modifiers(FINAL),
+            Modifiers(Flag.FINAL),
             anon,
             List(),
             Template(
-              List(TypeTree(typeToMock)),
+              if (isTrait) List(TypeTree(typeOf[AnyRef]), TypeTree(typeToMock)) else List(TypeTree(typeToMock)),
               noSelfType,
-              initDef +: members))),
-        callConstructor(New(Ident(anon))))
+              initDef +: members
+            )
+          )
+        ),
+        Apply(Select(New(Ident(anon)), termNames.CONSTRUCTOR), Nil)
+      )
+    }
 
     val typeToMock = weakTypeOf[T]
     val anon = TypeName("$anon")
     val methodsToMock = methodsNotInObject.filter { m =>
+      val flags = m.asInstanceOf[reflect.internal.HasFlags]
       !m.isConstructor && !m.isPrivate && m.privateWithin == NoSymbol &&
       !m.isFinal &&
-        !m.asInstanceOf[reflect.internal.HasFlags].hasFlag(reflect.internal.Flags.BRIDGE) &&
-        !m.isParamWithDefault && // see issue #43
-        (!(m.isStable || m.isAccessor) ||
-          m.asInstanceOf[reflect.internal.HasFlags].isDeferred) //! TODO - stop using internal if/when this gets into the API
+      !flags.hasFlag(reflect.internal.Flags.BRIDGE) &&
+      !m.isParamWithDefault && // see issue #43
+      !m.annotations.exists(_.tree.tpe =:= typeOf[scala.deprecatedOverriding]) &&
+      (!(m.isStable || m.isAccessor) || flags.isDeferred)
     }.toList
     val forwarders = methodsToMock map forwarderImpl
     val mocks = methodsToMock.map(mockMethod(_))
