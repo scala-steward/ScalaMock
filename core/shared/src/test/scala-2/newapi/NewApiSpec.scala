@@ -1121,5 +1121,10 @@ class NewApiSpec extends AnyFunSpec with Matchers with Stubs {
     m.withDefaultParamAndTypeParam[Int]("default", 5) shouldBe 5
     m.withDefaultParamAndTypeParam[Int]("defaul", 5) shouldBe 6
   }
+
+  it("should mock generic Iterable") {
+    val m = stub[Iterable[Int]]
+  }
+
 }
 

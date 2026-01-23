@@ -40,61 +40,60 @@ class MockMaker[C <: Context](val ctx: C) {
 
     import utils._
 
-    def mockFunctionClass(paramCount: Int): Type = paramCount match {
-      case 0 => typeOf[MockFunction0[_]]
-      case 1 => typeOf[MockFunction1[_, _]]
-      case 2 => typeOf[MockFunction2[_, _, _]]
-      case 3 => typeOf[MockFunction3[_, _, _, _]]
-      case 4 => typeOf[MockFunction4[_, _, _, _, _]]
-      case 5 => typeOf[MockFunction5[_, _, _, _, _, _]]
-      case 6 => typeOf[MockFunction6[_, _, _, _, _, _, _]]
-      case 7 => typeOf[MockFunction7[_, _, _, _, _, _, _, _]]
-      case 8 => typeOf[MockFunction8[_, _, _, _, _, _, _, _, _]]
-      case 9 => typeOf[MockFunction9[_, _, _, _, _, _, _, _, _, _]]
-      case 10 => typeOf[MockFunction10[_, _, _, _, _, _, _, _, _, _, _]]
-      case 11 => typeOf[MockFunction11[_, _, _, _, _, _, _, _, _, _, _, _]]
-      case 12 => typeOf[MockFunction12[_, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 13 => typeOf[MockFunction13[_, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 14 => typeOf[MockFunction14[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 15 => typeOf[MockFunction15[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 16 => typeOf[MockFunction16[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 17 => typeOf[MockFunction17[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 18 => typeOf[MockFunction18[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 19 => typeOf[MockFunction19[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 20 => typeOf[MockFunction20[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 21 => typeOf[MockFunction21[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 22 => typeOf[MockFunction22[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case _ => ctx.abort(ctx.enclosingPosition, "ScalaMock: Can't handle methods with more than 22 parameters (yet)")
+    def classType(paramCount: Int, stub: Boolean): Type = {
+      if (stub) paramCount match {
+        case 0 => typeOf[StubFunction0[Any]]
+        case 1 => typeOf[StubFunction1[Any, Any]]
+        case 2 => typeOf[StubFunction2[Any, Any, Any]]
+        case 3 => typeOf[StubFunction3[Any, Any, Any, Any]]
+        case 4 => typeOf[StubFunction4[Any, Any, Any, Any, Any]]
+        case 5 => typeOf[StubFunction5[Any, Any, Any, Any, Any, Any]]
+        case 6 => typeOf[StubFunction6[Any, Any, Any, Any, Any, Any, Any]]
+        case 7 => typeOf[StubFunction7[Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 8 => typeOf[StubFunction8[Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 9 => typeOf[StubFunction9[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 10 => typeOf[StubFunction10[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 11 => typeOf[StubFunction11[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 12 => typeOf[StubFunction12[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 13 => typeOf[StubFunction13[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 14 => typeOf[StubFunction14[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 15 => typeOf[StubFunction15[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 16 => typeOf[StubFunction16[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 17 => typeOf[StubFunction17[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 18 => typeOf[StubFunction18[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 19 => typeOf[StubFunction19[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 20 => typeOf[StubFunction20[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 21 => typeOf[StubFunction21[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 22 => typeOf[StubFunction22[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case _ => ctx.abort(ctx.enclosingPosition, "ScalaMock: Can't handle methods with more than 22 parameters (yet)")
+      } else paramCount match {
+        case 0 => typeOf[MockFunction0[Any]]
+        case 1 => typeOf[MockFunction1[Any, Any]]
+        case 2 => typeOf[MockFunction2[Any, Any, Any]]
+        case 3 => typeOf[MockFunction3[Any, Any, Any, Any]]
+        case 4 => typeOf[MockFunction4[Any, Any, Any, Any, Any]]
+        case 5 => typeOf[MockFunction5[Any, Any, Any, Any, Any, Any]]
+        case 6 => typeOf[MockFunction6[Any, Any, Any, Any, Any, Any, Any]]
+        case 7 => typeOf[MockFunction7[Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 8 => typeOf[MockFunction8[Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 9 => typeOf[MockFunction9[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 10 => typeOf[MockFunction10[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 11 => typeOf[MockFunction11[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 12 => typeOf[MockFunction12[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 13 => typeOf[MockFunction13[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 14 => typeOf[MockFunction14[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 15 => typeOf[MockFunction15[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 16 => typeOf[MockFunction16[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 17 => typeOf[MockFunction17[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 18 => typeOf[MockFunction18[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 19 => typeOf[MockFunction19[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 20 => typeOf[MockFunction20[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 21 => typeOf[MockFunction21[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case 22 => typeOf[MockFunction22[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+        case _ =>
+          ctx.abort(ctx.enclosingPosition, "ScalaMock: Can't handle methods with more than 22 parameters (yet)")
+      }
     }
-
-    def stubFunctionClass(paramCount: Int): Type = paramCount match {
-      case 0 => typeOf[StubFunction0[_]]
-      case 1 => typeOf[StubFunction1[_, _]]
-      case 2 => typeOf[StubFunction2[_, _, _]]
-      case 3 => typeOf[StubFunction3[_, _, _, _]]
-      case 4 => typeOf[StubFunction4[_, _, _, _, _]]
-      case 5 => typeOf[StubFunction5[_, _, _, _, _, _]]
-      case 6 => typeOf[StubFunction6[_, _, _, _, _, _, _]]
-      case 7 => typeOf[StubFunction7[_, _, _, _, _, _, _, _]]
-      case 8 => typeOf[StubFunction8[_, _, _, _, _, _, _, _, _]]
-      case 9 => typeOf[StubFunction9[_, _, _, _, _, _, _, _, _, _]]
-      case 10 => typeOf[StubFunction10[_, _, _, _, _, _, _, _, _, _, _]]
-      case 11 => typeOf[StubFunction11[_, _, _, _, _, _, _, _, _, _, _, _]]
-      case 12 => typeOf[StubFunction12[_, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 13 => typeOf[StubFunction13[_, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 14 => typeOf[StubFunction14[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 15 => typeOf[StubFunction15[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 16 => typeOf[StubFunction16[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 17 => typeOf[StubFunction17[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 18 => typeOf[StubFunction18[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 19 => typeOf[StubFunction19[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 20 => typeOf[StubFunction20[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 21 => typeOf[StubFunction21[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case 22 => typeOf[StubFunction22[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]]
-      case _ => ctx.abort(ctx.enclosingPosition, "ScalaMock: Can't handle methods with more than 22 parameters (yet)")
-    }
-
-    def classType(paramCount: Int) = if (stub) stubFunctionClass(paramCount) else mockFunctionClass(paramCount)
 
     def isPathDependentThis(t: Type): Boolean = t match {
       case TypeRef(pre, _, _) => isPathDependentThis(pre)
@@ -103,30 +102,27 @@ class MockMaker[C <: Context](val ctx: C) {
     }
 
     /**
-      * Translates forwarder parameters into Trees.
-      * Also maps Java repeated params into Scala repeated params
-      */
-    def forwarderParamType(t: Type): Tree = t match {
-      case TypeRef(pre, sym, args) if sym == JavaRepeatedParamClass =>
-        TypeTree(internalTypeRef(pre, RepeatedParamClass, args))
-      case TypeRef(pre, sym, args) if isPathDependentThis(t) =>
-        AppliedTypeTree(Ident(TypeName(sym.name.toString)), args map TypeTree _)
-      case _ =>
-        TypeTree(t)
+     * Checks if a type is a ThisType that refers to the type being mocked.
+     */
+    def isThisType(t: Type): Boolean = t match {
+      case ThisType(tpe) => tpe == typeToMock.typeSymbol
+      case _ => false
     }
 
     /**
-     *  Translates mock function parameters into Trees.
-     *  The difference between forwarderParamType is that:
-     *  T* and T... are translated into Seq[T]
-     *
-     *  see issue #24
-     */
-    def mockParamType(t: Type): Tree = t match {
-      case TypeRef(pre, sym, args) if sym == JavaRepeatedParamClass || sym == RepeatedParamClass =>
-        AppliedTypeTree(Ident(typeOf[Seq[_]].typeSymbol), args map TypeTree _)
-      case TypeRef(pre, sym, args) if isPathDependentThis(t) =>
-        AppliedTypeTree(Ident(TypeName(sym.name.toString)), args map TypeTree _)
+      * Translates forwarder parameters into Trees.
+      * Also maps Java repeated params into Scala repeated params.
+      * Also handles path-dependent this types in type arguments.
+      */
+    def forwarderParamType(t: Type): Tree = t match {
+      case TypeRef(pre, sym, args) if sym == JavaRepeatedParamClass =>
+        TypeTree(internal.typeRef(pre, RepeatedParamClass, args))
+      case TypeRef(_, sym, args) if isPathDependentThis(t) =>
+        AppliedTypeTree(Ident(TypeName(sym.name.toString)), args.map(forwarderParamType))
+      case TypeRef(_, sym, args) if args.exists(arg => isThisType(arg) || arg.exists(isThisType)) =>
+        AppliedTypeTree(Ident(sym), args.map(forwarderParamType))
+      case t if isThisType(t) =>
+        SingletonTypeTree(This(TypeName("")))
       case _ =>
         TypeTree(t)
     }
@@ -139,41 +135,19 @@ class MockMaker[C <: Context](val ctx: C) {
     def resolvedType(m: Symbol): Type =
       m.typeSignatureIn(internalSuperType(internalThisType(typeToMock.typeSymbol), typeToMock))
 
-    def buildForwarderParams(methodType: Type) =
-      paramss(methodType) map { params =>
-        params map { p =>
-          ValDef(
-            Modifiers(PARAM | (if (p.isImplicit) IMPLICIT else NoFlags)),
-            TermName(p.name.toString),
-            forwarderParamType(p.typeSignature),
-            EmptyTree)
-        }
-      }
-
-    // def <|name|>(p1: T1, p2: T2, ...): T = <|mockname|>(p1, p2, ...)
-    def methodDef(m: MethodSymbol, methodType: Type, body: Tree): DefDef = {
-      val params = buildForwarderParams(methodType)
-      DefDef(
-        Modifiers(OVERRIDE),
-        m.name,
-        m.typeParams map { p => internalTypeDef(p) },
-        params,
-        forwarderParamType(finalResultType(methodType)),
-        body)
-    }
-
-    def methodImpl(m: MethodSymbol, methodType: Type, body: Tree): DefDef = {
-      methodType match {
-        case NullaryMethodType(_) => methodDef(m, methodType, body)
-        case MethodType(_, _) => methodDef(m, methodType, body)
-        case PolyType(_, _) => methodDef(m, methodType, body)
-        case _ => ctx.abort(ctx.enclosingPosition,
-          s"ScalaMock: Don't know how to handle ${methodType.getClass}. Please open a ticket at https://github.com/paulbutcher/ScalaMock/issues")
+    def wrapByNameParam(p: Symbol): Tree = {
+      val ident = Ident(TermName(p.name.toString))
+      p.typeSignature match {
+        case TypeRef(_, sym, _) if sym == definitions.ByNameParamClass =>
+          q"() => $ident"
+        case _ =>
+          ident
       }
     }
 
     def forwarderImpl(m: MethodSymbol): ValOrDefDef = {
       val mt = resolvedType(m)
+      val resType = forwarderParamType(finalResultType(mt))
       if (m.isStable) {
         ValDef(
           Modifiers(),
@@ -181,16 +155,30 @@ class MockMaker[C <: Context](val ctx: C) {
           TypeTree(mt),
           castTo(literal(null), mt))
       } else {
-        val body = applyListOn(
-          Select(This(anon), mockFunctionName(m)), "apply",
-          paramss(mt).flatten map { p => Ident(TermName(p.name.toString)) })
-        methodImpl(m, mt, body)
+        DefDef(
+          Modifiers(Flag.OVERRIDE),
+          m.name,
+          mt.typeParams.map(internal.typeDef),
+          paramss(mt).map(_.map { p =>
+            ValDef(
+              Modifiers(Flag.PARAM | (if (p.isImplicit) Flag.IMPLICIT else NoFlags)),
+              TermName(p.name.toString),
+              forwarderParamType(p.typeSignature),
+              EmptyTree
+            )
+          }),
+          forwarderParamType(finalResultType(mt)),
+          q"""
+            ${mockFunctionName(m)}
+              .apply(..${paramss(mt).flatten.map(wrapByNameParam)})
+              .asInstanceOf[$resType]
+          """
+        )
       }
     }
 
     def mockFunctionName(m: MethodSymbol) = {
-      val method = typeToMock.member(m.name).asTerm
-      val index = method.alternatives.indexOf(m)
+      val index = typeToMock.member(m.name).asTerm.alternatives.indexOf(m)
       assert(index >= 0)
       TermName("mock$" + m.name + "$" + index)
     }
@@ -198,17 +186,16 @@ class MockMaker[C <: Context](val ctx: C) {
     // val <|mockname|> = new MockFunctionN[T1, T2, ..., R](mockContext, '<|name|>)
     def mockMethod(m: MethodSymbol): ValDef = {
       val mt = resolvedType(m)
-      val clazz = classType(paramCount(mt))
-      val types = (paramTypes(mt) map mockParamType _) :+ mockParamType(finalResultType(mt))
+      val clazz = classType(paramCount(mt), stub)
       val name = applyOn(scalaSymbol, "apply", mockNameGenerator.generateMockMethodName(m, mt))
       val termName = mockFunctionName(m)
       val additionalAnnotations = if(isScalaJs) List(jsExport(termName.encodedName.toString)) else Nil
       ValDef(
         Modifiers().mapAnnotations(additionalAnnotations ::: _),
         mockFunctionName(m),
-        AppliedTypeTree(Ident(clazz.typeSymbol), types), // see issue #24
+        TypeTree(clazz),
         callConstructor(
-          New(AppliedTypeTree(Ident(clazz.typeSymbol), types)),
+          New(TypeTree(clazz)),
           mockContext.tree, name
         )
       )
@@ -317,6 +304,7 @@ class MockMaker[C <: Context](val ctx: C) {
       !m.isFinal &&
         !m.asInstanceOf[reflect.internal.HasFlags].hasFlag(reflect.internal.Flags.BRIDGE) &&
         !m.isParamWithDefault && // see issue #43
+        !m.annotations.exists(_.tree.tpe =:= typeOf[scala.deprecatedOverriding]) &&
         (!(m.isStable || m.isAccessor) ||
           m.asInstanceOf[reflect.internal.HasFlags].isDeferred) //! TODO - stop using internal if/when this gets into the API
     }.toList
