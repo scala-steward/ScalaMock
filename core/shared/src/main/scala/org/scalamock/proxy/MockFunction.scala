@@ -22,6 +22,7 @@ package org.scalamock.proxy
 
 import org.scalamock.context.{Call, MockContext}
 
+@deprecated(message = "proxy mocks are deprecated")
 class MockFunction(mockContext: MockContext, name: Symbol) extends FakeFunction(mockContext, name) {
 
   def onUnexpected(call: Call) = mockContext.reportUnexpectedCall(call)
