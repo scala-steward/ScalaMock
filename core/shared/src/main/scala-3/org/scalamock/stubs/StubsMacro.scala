@@ -129,7 +129,7 @@ def stubbed0Macro[R: Type](f: Expr[() => R])(using Quotes): Expr[StubbedMethod[U
 @experimental
 private
 def stubbed1Macro[T1: Type, R: Type](f: Expr[T1 => R])(using Quotes): Expr[StubbedMethod[T1, R]] =
-  new internal.StubMaker().getStubbed[T1, R](f)
+  new internal.StubMaker().getStubbed1[T1, R](f)
 
 @experimental
 private

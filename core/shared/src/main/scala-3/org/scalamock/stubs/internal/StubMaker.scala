@@ -211,6 +211,10 @@ private[stubs] class StubMaker(
     searchTermWithMethod(select.asTerm, Nil).selectReflect[StubbedMethod[Unit, R]](_.stubValName)
 
   @experimental
+  def getStubbed1[T1: Type, R: Type](select: Expr[Any]): Expr[StubbedMethod[T1, R]] =
+    searchTermWithMethod(select.asTerm, List(TypeRepr.of[T1])).selectReflect[StubbedMethod[T1, R]](_.stubValName)
+
+  @experimental
   def getStubbed[Args: Type, R: Type](select: Expr[Any]): Expr[StubbedMethod[Args, R]] =
     searchTermWithMethod(select.asTerm, tupleTypeToList(TypeRepr.of[Args])).selectReflect[StubbedMethod[Args, R]](_.stubValName)
 
