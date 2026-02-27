@@ -20,10 +20,12 @@
 
 package org.scalamock.clazz
 
-import org.scalamock.util.{MacroAdapter, MacroUtils}
+import org.scalamock.util.Utils
+
+import scala.reflect.macros.blackbox
 
 object MockFunctionFinder {
-  import MacroAdapter.Context
+  type Context = blackbox.Context
 
   /**
    * Given something of the structure <|o.m _|> where o is a mock object
@@ -32,7 +34,7 @@ object MockFunctionFinder {
   def findMockFunction[F: c.WeakTypeTag, M: c.WeakTypeTag](c: Context)(f: c.Expr[F], actuals: List[c.universe.Type]): c.Expr[M] = {
     import c.universe._
 
-    val utils = new MacroUtils[c.type](c)
+    val utils = new Utils[c.type](c)
     import utils._
 
     // todo: JS implementation is needed here
@@ -66,7 +68,7 @@ object MockFunctionFinder {
   // from the macro API (c.f. https://groups.google.com/d/msg/scala-internals/R1iZXfotqds/3xytfX39U2wJ)
   //! TODO - replace with official resolveOverloaded if/when it's reinstated
   def resolveOverloaded(c: Context)(method: c.universe.TermSymbol, targs: List[c.universe.Type], actuals: List[c.universe.Type]): c.universe.Symbol = {
-    val utils = new MacroUtils[c.type](c)
+    val utils = new Utils[c.type](c)
     import c.universe._
     import utils._
 

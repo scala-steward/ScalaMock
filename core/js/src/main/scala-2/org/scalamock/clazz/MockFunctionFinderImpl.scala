@@ -20,10 +20,10 @@
 
 package org.scalamock.clazz
 
-import org.scalamock.util.{MacroAdapter, MacroUtils}
+import scala.reflect.macros.blackbox
 
 object MockFunctionFinderImpl {
-  import MacroAdapter.Context
+  type Context = blackbox.Context
 
   // obj.asInstanceOf[js.Dynamic].{name}.asInstanceOf[MockFunctionX[...]]
   def mockedFunctionGetter[M: c.WeakTypeTag](c: Context)
