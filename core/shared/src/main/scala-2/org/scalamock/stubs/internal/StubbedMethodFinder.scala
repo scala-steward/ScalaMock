@@ -21,13 +21,14 @@
 
 package org.scalamock.stubs.internal
 
-import org.scalamock.util.{MacroAdapter, MacroUtils}
+import org.scalamock.util.Utils
 import org.scalamock.stubs.{StubbedMethod, Stub}
 
+import scala.reflect.macros.blackbox
 
 private[scalamock]
 object StubbedMethodFinder {
-  import MacroAdapter.Context
+  type Context = blackbox.Context
 
   /**
    * Given something of the structure <|o.m _|> where o is a mock object
@@ -42,7 +43,7 @@ object StubbedMethodFinder {
     actuals: List[c.universe.Type]
   ): c.Expr[M] = {
     import c.universe._
-    val utils = new MacroUtils[c.type](c)
+    val utils = new Utils[c.type](c)
     import utils._
 
     def mockedFunctionGetter(obj: Tree, name: Name, targs: List[Type]): c.Expr[M] =
@@ -75,7 +76,7 @@ object StubbedMethodFinder {
   }
 
   def resolveOverloaded(c: Context)(method: c.universe.TermSymbol, targs: List[c.universe.Type], actuals: List[c.universe.Type]): c.universe.Symbol = {
-    val utils = new MacroUtils[c.type](c)
+    val utils = new Utils[c.type](c)
     import c.universe._
     import utils._
 

@@ -20,20 +20,13 @@
 
 package org.scalamock.stubs.internal
 
-import org.scalamock.context.MockContext
-import org.scalamock.util.MacroAdapter.Context
-import org.scalamock.stubs.{StubbedMethod, Stub}
+import org.scalamock.stubs.StubbedMethod
+
+import scala.reflect.macros.blackbox
 
 private[scalamock]
 object StubMakerImpl {
-
-  def stub[T: c.WeakTypeTag](c: Context)(
-    createdStubs: c.Expr[CreatedStubs],
-    stubUniqueIndexGenerator: c.Expr[StubUniqueIndexGenerator]
-  ): c.Expr[Stub[T]] = {
-    val maker = new StubMaker[c.type](c)
-    new maker.StubMakerInner[T](createdStubs, stubUniqueIndexGenerator).make
-  }
+  type Context = blackbox.Context
 
   def toStubbedMethod0[R: c.WeakTypeTag](c: Context)(f: c.Expr[R]): c.Expr[StubbedMethod[Unit, R]] =
     StubbedMethodFinder.find[StubbedMethod[Unit, R]](c)(f, List(c.weakTypeOf[Unit]))

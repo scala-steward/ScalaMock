@@ -16,6 +16,15 @@ class VarSpec extends AnyFunSpec with MockFactory with Matchers {
     var concreteVar = "foo"
   }
 
+  class WithParameters(foo: Int, bar: String)
+
+  it("mock constructor arguments") {
+    withExpectations {
+      val m = mock[WithParameters]
+      m.toString
+    }
+  }
+
   it("mock traits with vars") {
     withExpectations {
       val m = mock[Vars]

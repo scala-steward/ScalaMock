@@ -21,10 +21,11 @@
 // placed in org.scalamock package to access MockContext
 package org.scalamock.clazz.ziotest.macros
 
-import org.scalamock.clazz.MockImpl.MockMaker
+import org.scalamock.clazz.MockMaker
 import org.scalamock.context.MockContext
-import org.scalamock.util.MacroAdapter
+
 import scala.language.existentials
+import scala.reflect.macros.blackbox
 
 /**
  * Creates mocks that check if an effect was called.
@@ -79,7 +80,7 @@ import scala.language.existentials
  */
 private[scalamock] object CheckEffectInvocationMacros {
 
-  import MacroAdapter.Context
+  type Context = blackbox.Context
 
   def mock[T: c.WeakTypeTag](c: Context)(mockContext: c.Expr[MockContext]): c.Expr[T] = {
     make[T](c)(mockContext)(stub = false, mockName = None)
@@ -108,8 +109,7 @@ private[scalamock] object CheckEffectInvocationMacros {
     )(mockContext: c.Expr[MockContext]
     )(stub: Boolean,
       mockName: Option[c.Expr[String]]): c.Expr[T] = {
-    val maker = MockMaker[T](c)(mockContext, stub, mockName)
-    val originalTree = maker.make
+    val originalTree = MockMaker.instance[T](c)(mockContext, stub, mockName)
     val transformedTree = transformAst(c)(originalTree.tree)
     c.Expr[T](transformedTree)
   }

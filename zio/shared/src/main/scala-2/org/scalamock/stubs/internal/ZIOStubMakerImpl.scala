@@ -1,10 +1,13 @@
 package org.scalamock.stubs.internal
 
 import org.scalamock.stubs.{StubbedZIOMethod, StubbedMethod}
-import org.scalamock.util.MacroAdapter.Context
+
+import scala.reflect.macros.blackbox
 
 private[scalamock]
 object ZIOStubMakerImpl {
+  type Context = blackbox.Context
+
   def toStubbedMethod00[R: c.WeakTypeTag](c: Context)(f: c.Expr[R])(ev: c.Expr[Any]): c.Expr[StubbedZIOMethod[Unit, R]] = {
     import c.universe._
     val sm = StubbedMethodFinder.find[StubbedMethod[Unit, R]](c)(f, List(c.weakTypeOf[Unit]))

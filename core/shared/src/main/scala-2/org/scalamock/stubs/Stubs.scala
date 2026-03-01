@@ -20,7 +20,7 @@
 
 package org.scalamock.stubs
 
-import org.scalamock.stubs.internal.StubMakerImpl
+import org.scalamock.stubs.internal.{StubMaker, StubMakerImpl}
 
 import scala.language.experimental.macros
 import scala.language.implicitConversions
@@ -40,7 +40,7 @@ trait StubsBase {
   def stub[T](implicit
     createdStubs: internal.CreatedStubs,
     stubUniqueIndexGenerator: internal.StubUniqueIndexGenerator
-  ): Stub[T] = macro StubMakerImpl.stub[T]
+  ): Stub[T] = macro StubMaker.instance[T]
 }
 
 trait Stubs extends StubsBase {

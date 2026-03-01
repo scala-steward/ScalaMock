@@ -48,6 +48,8 @@ abstract class FakeFunction(protected val mockContext: MockContext, private[scal
       throw new RuntimeException(msg)
     }
   }
+
+  def impl(arguments: Product): Any = handle(arguments)
   
   protected def onUnexpected(call: Call): Any
 }

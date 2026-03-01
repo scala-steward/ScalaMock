@@ -20,12 +20,13 @@
 
 package org.scalamock.stubs.internal
 
-import org.scalamock.util.MacroAdapter
 import org.scalamock.stubs.StubbedMethod
+
+import scala.reflect.macros.blackbox
 
 private[scalamock]
 object StubbedMethodFinderImpl {
-  import MacroAdapter.Context
+  type Context = blackbox.Context
 
   def find[
     M: c.WeakTypeTag

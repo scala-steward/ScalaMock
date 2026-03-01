@@ -23,35 +23,25 @@ package org.scalamock.clazz
 import org.scalamock.clazz.MockFunctionFinder.findMockFunction
 import org.scalamock.context.MockContext
 import org.scalamock.function._
-import org.scalamock.util.{Defaultable, MacroAdapter}
+import org.scalamock.util.Defaultable
+
+import scala.reflect.macros.blackbox
 
 object MockImpl {
-  import MacroAdapter.Context
+  type Context = blackbox.Context
 
-  def mock[T: c.WeakTypeTag](c: Context)(mockContext: c.Expr[MockContext]): c.Expr[T] = {
-    val maker = MockMaker[T](c)(mockContext, stub = false, mockName = None)
-    maker.make
-  }
+  def mock[T: c.WeakTypeTag](c: Context)(mockContext: c.Expr[MockContext]): c.Expr[T] =
+    MockMaker.instance[T](c)(mockContext, stub = false, mockName = None)
 
-  def stub[T: c.WeakTypeTag](c: Context)(mockContext: c.Expr[MockContext]): c.Expr[T] = {
-    val maker = MockMaker[T](c)(mockContext, stub = true, mockName = None)
-    maker.make
-  }
+  def stub[T: c.WeakTypeTag](c: Context)(mockContext: c.Expr[MockContext]): c.Expr[T] =
+    MockMaker.instance[T](c)(mockContext, stub = true, mockName = None)
 
-  def mockWithName[T: c.WeakTypeTag](c: Context)(mockName: c.Expr[String])(mockContext: c.Expr[MockContext]): c.Expr[T] = {
-    val maker = MockMaker[T](c)(mockContext, stub = false, mockName = Some(mockName))
-    maker.make
-  }
+  def mockWithName[T: c.WeakTypeTag](c: Context)(mockName: c.Expr[String])(mockContext: c.Expr[MockContext]): c.Expr[T] =
+    MockMaker.instance[T](c)(mockContext, stub = false, mockName = Some(mockName))
 
-  def stubWithName[T: c.WeakTypeTag](c: Context)(mockName: c.Expr[String])(mockContext: c.Expr[MockContext]): c.Expr[T] = {
-    val maker = MockMaker[T](c)(mockContext, stub = true, mockName = Some(mockName))
-    maker.make
-  }
+  def stubWithName[T: c.WeakTypeTag](c: Context)(mockName: c.Expr[String])(mockContext: c.Expr[MockContext]): c.Expr[T] =
+    MockMaker.instance[T](c)(mockContext, stub = true, mockName = Some(mockName))
 
-  def MockMaker[T: c.WeakTypeTag](c: Context)(mockContext: c.Expr[MockContext], stub: Boolean, mockName: Option[c.Expr[String]]) = {
-    val m = new MockMaker[c.type](c)
-    new m.MockMakerInner[T](mockContext, stub, mockName)
-  }
 
   def toMockFunction0[R: c.WeakTypeTag](c: Context)(f: c.Expr[() => R])(evidence$1: c.Expr[Defaultable[R]]) =
     findMockFunction[() => R, MockFunction0[R]](c)(f, List())

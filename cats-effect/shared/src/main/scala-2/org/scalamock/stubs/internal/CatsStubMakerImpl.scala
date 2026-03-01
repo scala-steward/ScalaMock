@@ -1,10 +1,13 @@
 package org.scalamock.stubs.internal
 
 import org.scalamock.stubs.{StubbedIOMethod, StubbedMethod}
-import org.scalamock.util.MacroAdapter.Context
+
+import scala.reflect.macros.blackbox
 
 private[scalamock]
 object CatsStubMakerImpl {
+  type Context = blackbox.Context
+
   def toStubbedMethod00[R: c.WeakTypeTag](c: Context)(f: c.Expr[R])(ev: c.Expr[Any]): c.Expr[StubbedIOMethod[Unit, R]] = {
     import c.universe._
     val sm = StubbedMethodFinder.find[StubbedMethod[Unit, R]](c)(f, List(c.weakTypeOf[Unit]))
