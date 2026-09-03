@@ -110,6 +110,8 @@ def crossScalaSettings = {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, _)) =>
           Seq("-Xlint:adapted-args", "-Xfatal-warnings")
+        case Some((3, _)) =>
+          Seq("-Yexplicit-nulls", "-language:unsafeNulls")
         case _ =>
           Seq.empty
       }
