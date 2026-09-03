@@ -413,7 +413,7 @@ class MockTest extends AnyFreeSpec with MockFactory with Matchers {
 
       val provider = mock[DataProviderComponent]
 
-      (provider.find[User](_: Int)(_: ClassTag[User])) expects (13, *) returning (Failure[User](new Exception()))
+      (provider.find[User](_: Int)(using _: ClassTag[User])) expects (13, *) returning (Failure[User](new Exception()))
       provider.find[User](13) shouldBe a[Failure[_]]
     }
 

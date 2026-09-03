@@ -28,7 +28,6 @@ import org.scalamock.util.Defaultable
 import scala.quoted.*
 
 
-@scala.annotation.experimental
 private[clazz] object MockImpl:
   def mock[T: Type](mockContext: Expr[MockContext])(using quotes: Quotes): Expr[T] =
     MockMaker.instance[T](MockType.Mock, mockContext, name = None)

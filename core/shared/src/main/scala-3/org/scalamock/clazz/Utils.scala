@@ -20,7 +20,7 @@
 
 package org.scalamock.clazz
 
-import scala.annotation.{experimental, tailrec}
+import scala.annotation.tailrec
 import scala.quoted.*
 
 private[scalamock] class Utils(using val quotes: Quotes):
@@ -41,7 +41,6 @@ private[scalamock] class Utils(using val quotes: Quotes):
   object MockableDefinitions:
     private val objectMethods = TypeRepr.of[Object].typeSymbol.methodMembers.toSet
 
-    @experimental
     def find(tpe: TypeRepr, name: String, paramTypes: List[TypeRepr], appliedTypes: List[TypeRepr]): MockableDefinition =
       MockableDefinitions(tpe)
         .filter { method =>
@@ -149,7 +148,6 @@ private[scalamock] class Utils(using val quotes: Quotes):
     val tpe = ownerTpe.memberType(symbol)
     val (rawTypes, rawResType) = tpe.widen.collectTypes
 
-    @experimental
     def prepareResType(classSymbol: Symbol, methodArgs: List[List[Tree]], debug: Boolean = false): TypeRepr = {
       val methodTpe = This(classSymbol).tpe.memberType(symbol)
       val resType = methodTpe.collectTypes._2 match

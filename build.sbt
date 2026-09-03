@@ -4,11 +4,7 @@ lazy val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.19")
 lazy val specs2 = Def.setting("org.specs2" %%% "specs2-core" % "4.23.0")
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
-  /**
-   *  Symbol.newClass is marked experimental, so we should use @experimental annotation in every test suite.
-   *  3.3.0 has a bug so we can omit this annotation
-   */
-  scalaVersion := "3.3.0",
+  scalaVersion := "3.9.0",
   scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature")
 )
 
@@ -66,7 +62,8 @@ lazy val `scalamock-cats-effect` = crossProject(JSPlatform, JVMPlatform)
     commonSettings,
     crossScalaSettings,
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-effect" % "3.6.3",
+
+      "org.typelevel" %% "cats-effect" % "3.6.4",
       "org.typelevel" %% "munit-cats-effect" % "2.2.0" % Test
     )
   )
@@ -98,7 +95,7 @@ def crossScalaSettings = {
       }
     }
   Seq(
-    crossScalaVersions := Seq("2.12.21", "2.13.17", scalaVersion.value),
+    crossScalaVersions := Seq("2.12.21", "2.13.18", scalaVersion.value),
     Compile / unmanagedSourceDirectories ++= addDirsByScalaVersion("src/main").value,
     Test / unmanagedSourceDirectories ++= addDirsByScalaVersion("src/test").value,
     libraryDependencies ++= {

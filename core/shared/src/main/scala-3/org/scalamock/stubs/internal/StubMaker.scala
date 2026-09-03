@@ -23,7 +23,7 @@ package org.scalamock.stubs.internal
 import org.scalamock.clazz.{MakerUtils, Utils}
 import org.scalamock.stubs.{CallLog, Stub, StubIO, StubbedMethod}
 
-import scala.annotation.{experimental, tailrec}
+import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.quoted.{Expr, Quotes, Type}
@@ -35,7 +35,6 @@ private[stubs] class StubMaker(
 
   override def newApi = true
 
-  @experimental
   def newInstance[T: Type](
     collector: Expr[CreatedStubs],
     stubUniqueIndexGenerator: Expr[StubUniqueIndexGenerator]
@@ -46,7 +45,7 @@ private[stubs] class StubMaker(
     val log = Expr.summon[CallLog]
 
     val classSymbol = Symbol.newClass(
-      parent = Symbol.spliceOwner,
+      owner = Symbol.spliceOwner,
       name = "anon",
       parents = parents.map {
         case term: Term => term.tpe
@@ -202,19 +201,15 @@ private[stubs] class StubMaker(
         (acc += tpe).toList
 
 
-  @experimental
   def getStubbed00[R: Type](select: Expr[R]): Expr[StubbedMethod[Unit, R]] =
     searchTermWithMethod(select.asTerm, Nil).selectReflect[StubbedMethod[Unit, R]](_.stubValName)
 
-  @experimental
   def getStubbed0[R: Type](select: Expr[() => R]): Expr[StubbedMethod[Unit, R]] =
     searchTermWithMethod(select.asTerm, Nil).selectReflect[StubbedMethod[Unit, R]](_.stubValName)
 
-  @experimental
   def getStubbed1[T1: Type, R: Type](select: Expr[Any]): Expr[StubbedMethod[T1, R]] =
     searchTermWithMethod(select.asTerm, List(TypeRepr.of[T1])).selectReflect[StubbedMethod[T1, R]](_.stubValName)
 
-  @experimental
   def getStubbed[Args: Type, R: Type](select: Expr[Any]): Expr[StubbedMethod[Args, R]] =
     searchTermWithMethod(select.asTerm, tupleTypeToList(TypeRepr.of[Args])).selectReflect[StubbedMethod[Args, R]](_.stubValName)
 
