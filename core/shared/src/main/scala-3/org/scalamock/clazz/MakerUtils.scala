@@ -3,7 +3,7 @@ package org.scalamock.clazz
 import org.scalamock.stubs.Stub
 import org.scalamock.util.Defaultable
 
-import scala.annotation.{experimental, tailrec}
+import scala.annotation.tailrec
 import scala.quoted.{Expr, Quotes, Type}
 
 private[scalamock]
@@ -80,7 +80,6 @@ class MakerUtils(using override val quotes: Quotes) extends Utils:
    * @param appliedTypes collected applied types, when method is generic
    * @return StubWithMethod
    */
-  @experimental
   def searchTermWithMethod(term: Term, argTypes: List[TypeRepr], appliedTypes: List[TypeTree] = Nil): StubWithMethod =
     term match
       case Select(apply @ Apply(term, _), "apply") if apply.tpe.isContextFunctionType =>
