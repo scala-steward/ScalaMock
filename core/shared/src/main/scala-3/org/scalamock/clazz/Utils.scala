@@ -92,6 +92,9 @@ private[scalamock] class Utils(using val quotes: Quotes):
           case OrType(left, right) =>
             OrType(updateParamRefs(left, methodTpe), updateParamRefs(right, methodTpe))
 
+          case FlexibleType(other) =>
+            FlexibleType(updateParamRefs(other, methodTpe))
+
           case _ =>
             tpe
         }
@@ -172,6 +175,9 @@ private[scalamock] class Utils(using val quotes: Quotes):
 
               case AnnotatedType(other, annot) =>
                 AnnotatedType(loop(other), annot)
+
+              case FlexibleType(other) =>
+                FlexibleType(loop(other))
 
               case ff@TypeRef(ref@ParamRef(bindings, idx), name) =>
                 def getIndex(bindings: TypeRepr): Int =
