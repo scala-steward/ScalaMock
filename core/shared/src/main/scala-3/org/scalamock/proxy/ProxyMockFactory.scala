@@ -25,6 +25,7 @@ import org.scalamock.context.MockContext
 import java.lang.reflect.{InvocationHandler, Proxy as JavaProxy}
 import scala.reflect.{ClassTag, classTag}
 
+@deprecated(message = "proxy mocks are deprecated")
 trait ProxyMockFactory {
 
   protected def mock[T : ClassTag](implicit mockContext: MockContext) =

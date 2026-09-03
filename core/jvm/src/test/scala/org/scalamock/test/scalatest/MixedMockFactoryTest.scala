@@ -4,6 +4,7 @@ import org.scalamock.scalatest.MixedMockFactory
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+@deprecated(message = "proxy mocks are deprecated")
 class MixedMockFactoryTest extends AnyFlatSpec with MixedMockFactory with Matchers {
   "mixed mocks" should "work" in {
     trait Foo {
