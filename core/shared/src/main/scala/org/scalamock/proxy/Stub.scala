@@ -20,6 +20,7 @@
 
 package org.scalamock.proxy
 
+@deprecated(message = "proxy mocks are deprecated")
 trait Stub {
   def when(name: Symbol): FakeFunction#ExpectationHandler
   def verify(name: Symbol): FakeFunction#ExpectationHandler

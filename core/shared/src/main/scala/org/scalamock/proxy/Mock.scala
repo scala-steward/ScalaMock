@@ -20,6 +20,7 @@
 
 package org.scalamock.proxy
 
+@deprecated(message = "proxy mocks are deprecated")
 trait Mock {
   def expects(name: Symbol): FakeFunction#ExpectationHandler
 }

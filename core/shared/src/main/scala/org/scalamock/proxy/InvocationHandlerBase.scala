@@ -23,6 +23,7 @@ package org.scalamock.proxy
 import java.lang.reflect.{InvocationHandler, Method}
 import scala.collection.mutable.Map
 
+@deprecated(message = "proxy mocks are deprecated")
 abstract class InvocationHandlerBase[T <: FakeFunction] extends InvocationHandler {
 
   override def invoke(proxy: AnyRef, method: Method, args: Array[AnyRef]) = {

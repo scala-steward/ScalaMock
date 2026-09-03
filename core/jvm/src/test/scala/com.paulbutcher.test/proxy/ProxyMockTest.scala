@@ -24,6 +24,7 @@ import com.paulbutcher.test.TestTrait
 import org.scalamock.scalatest.proxy.MockFactory
 import org.scalatest.freespec.AnyFreeSpec
 
+@deprecated(message = "proxy mocks are deprecated")
 class ProxyMockTest extends AnyFreeSpec with MockFactory {
   
   autoVerify = false

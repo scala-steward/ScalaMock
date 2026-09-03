@@ -15,6 +15,7 @@ import scala.reflect.ClassTag
   */
 trait MixedMockFactory extends AbstractMockFactory with MacroMock { this: TestSuite =>
 
+  @deprecated(message = "proxy mocks are deprecated")
   object Proxy extends ProxyMockFactory {
     import org.scalamock.proxy._
     def mock[T: ClassTag]: T with Mock = super.mock[T]

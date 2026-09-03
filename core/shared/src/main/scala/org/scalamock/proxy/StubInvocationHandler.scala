@@ -22,6 +22,7 @@ package org.scalamock.proxy
 
 import org.scalamock.context.MockContext
 
+@deprecated(message = "proxy mocks are deprecated")
 class StubInvocationHandler(mockContext: MockContext) extends InvocationHandlerBase[StubFunction] {
 
   protected override def handle(name: Symbol, fake: => StubFunction) =

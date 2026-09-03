@@ -29,6 +29,7 @@ import org.scalatest.TestSuite
   *
   * See [[org.scalamock]] for overview documentation.
   */
+@deprecated(message = "proxy mocks are deprecated")
 trait MockFactory extends AbstractMockFactory with ProxyMockFactory { this: TestSuite =>
 
 }

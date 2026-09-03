@@ -24,6 +24,7 @@ import org.scalamock.context.{Call, MockContext}
 import org.scalamock.handlers.{CallHandler, Verify}
 import org.scalamock.matchers.MockParameter
 
+@deprecated(message = "proxy mocks are deprecated")
 class StubFunction(mockContext: MockContext, name: Symbol) extends FakeFunction(mockContext, name) {
 
   def onUnexpected(call: Call) = null

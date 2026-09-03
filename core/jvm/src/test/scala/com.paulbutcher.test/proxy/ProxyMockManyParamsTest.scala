@@ -24,6 +24,7 @@ import com.paulbutcher.test.ManyParamsTrait
 import org.scalamock.scalatest.proxy.MockFactory
 import org.scalatest.freespec.AnyFreeSpec
 
+@deprecated(message = "proxy mocks are deprecated")
 class ProxyMockManyParamsTest extends AnyFreeSpec with MockFactory {
 
   autoVerify = false

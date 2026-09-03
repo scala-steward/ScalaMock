@@ -31,6 +31,7 @@ import org.scalatest.matchers.should.Matchers
  *
  *  Test for issue #35
  */
+@deprecated(message = "proxy mocks are deprecated")
 class SuiteScopeProxyMockTest extends AnyFlatSpec with Matchers with OneInstancePerTest with MockFactory {
   // please note that this test suite mixes in OneInstancePerTest trait
 

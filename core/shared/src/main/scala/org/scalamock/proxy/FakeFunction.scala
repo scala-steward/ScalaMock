@@ -26,6 +26,7 @@ import org.scalamock.function.NiceToString
 import org.scalamock.handlers.CallHandler
 import org.scalamock.matchers.{ArgumentMatcher, MockParameter}
 
+@deprecated(message = "proxy mocks are deprecated")
 abstract class FakeFunction(mockContext: MockContext, name: Symbol)
     extends function.FakeFunction(mockContext, name) with NiceToString {
 
