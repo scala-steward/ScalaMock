@@ -20,8 +20,8 @@ jobs:
         distribution: 'adopt'
     - uses: sbt/setup-sbt@v1
     - name: Run tests
-      run: sbt ++2.12.20 test
-      
+      run: sbt ++2.12.21 test
+
   scala_2_13:
 
     runs-on: ubuntu-latest
@@ -35,7 +35,7 @@ jobs:
         distribution: 'adopt'
     - uses: sbt/setup-sbt@v1
     - name: Run tests
-      run: sbt ++2.13.15 test
+      run: sbt ++2.13.18 test
 
   scala_3:
 
@@ -50,4 +50,4 @@ jobs:
           distribution: 'adopt'
       - uses: sbt/setup-sbt@v1
       - name: Run tests
-        run: sbt ++3.3.0 test
+        run: sbt ++3.9.0 test
