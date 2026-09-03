@@ -25,7 +25,6 @@ import org.scalamock.context.MockContext
 import scala.quoted.*
 import scala.reflect.Selectable
 
-@scala.annotation.experimental
 private[clazz] object MockMaker:
   val MockDefaultNameValName = "mock$special$mockName"
 
@@ -39,7 +38,7 @@ private[clazz] object MockMaker:
       Symbol.newVal(classSymbol, MockDefaultNameValName, TypeRepr.of[String], Flags.EmptyFlags, Symbol.noSymbol)
 
     val classSymbol: Symbol = Symbol.newClass(
-      parent = Symbol.spliceOwner,
+      owner = Symbol.spliceOwner,
       name = "$anon",
       parents = parents.map {
         case term: Term => term.tpe

@@ -1,6 +1,5 @@
 package org.scalamock.stubs
 
-import scala.annotation.experimental
 import scala.quoted.{Expr, Quotes, Type}
 
 private
@@ -107,7 +106,6 @@ private
 inline def stubbed22Impl[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, R](inline f: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22) => R): StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22), R] =
   ${ stubbed22Macro[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, R]('{ f }) }
 
-@experimental
 private
 def stubMacro[T: Type](
   collector: Expr[internal.CreatedStubs],
@@ -116,122 +114,98 @@ def stubMacro[T: Type](
   new internal.StubMaker().newInstance[T](collector, stubUniqueIndexGenerator)
 
 
-@experimental
 private
 def stubbed00Macro[R: Type](f: Expr[R])(using Quotes): Expr[StubbedMethod[Unit, R]] =
   new internal.StubMaker().getStubbed00[R](f)
 
-@experimental
 private
 def stubbed0Macro[R: Type](f: Expr[() => R])(using Quotes): Expr[StubbedMethod[Unit, R]] =
   new internal.StubMaker().getStubbed0[R](f)
 
-@experimental
 private
 def stubbed1Macro[T1: Type, R: Type](f: Expr[T1 => R])(using Quotes): Expr[StubbedMethod[T1, R]] =
   new internal.StubMaker().getStubbed1[T1, R](f)
 
-@experimental
 private
 def stubbed2Macro[T1: Type, T2: Type, R: Type](f: Expr[(T1, T2) => R])(using Quotes): Expr[StubbedMethod[(T1, T2), R]] =
   new internal.StubMaker().getStubbed[(T1, T2), R](f)
 
-@experimental
 private
 def stubbed3Macro[T1: Type, T2: Type, T3: Type, R: Type](f: Expr[(T1, T2, T3) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3), R](f)
 
-@experimental
 private
 def stubbed4Macro[T1: Type, T2: Type, T3: Type, T4: Type, R: Type](f: Expr[(T1, T2, T3, T4) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4), R](f)
 
-@experimental
 private
 def stubbed5Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5), R](f)
 
-@experimental
 private
 def stubbed6Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6), R](f)
 
-@experimental
 private
 def stubbed7Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7), R](f)
 
-@experimental
 private
 def stubbed8Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8), R](f)
 
-@experimental
 private
 def stubbed9Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9), R](f)
 
-@experimental
 private
 def stubbed10Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, T10: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10), R](f)
 
-@experimental
 private
 def stubbed11Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, T10: Type, T11: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11), R](f)
 
-@experimental
 private
 def stubbed12Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, T10: Type, T11: Type, T12: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12), R](f)
 
-@experimental
 private
 def stubbed13Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, T10: Type, T11: Type, T12: Type, T13: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13), R](f)
 
-@experimental
 private
 def stubbed14Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, T10: Type, T11: Type, T12: Type, T13: Type, T14: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14), R](f)
 
-@experimental
 private
 def stubbed15Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, T10: Type, T11: Type, T12: Type, T13: Type, T14: Type, T15: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15), R](f)
 
-@experimental
 private
 def stubbed16Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, T10: Type, T11: Type, T12: Type, T13: Type, T14: Type, T15: Type, T16: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16), R](f)
 
-@experimental
 private
 def stubbed17Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, T10: Type, T11: Type, T12: Type, T13: Type, T14: Type, T15: Type, T16: Type, T17: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17), R](f)
 
-@experimental
 private
 def stubbed18Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, T10: Type, T11: Type, T12: Type, T13: Type, T14: Type, T15: Type, T16: Type, T17: Type, T18: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18), R](f)
 
-@experimental
 private
 def stubbed19Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, T10: Type, T11: Type, T12: Type, T13: Type, T14: Type, T15: Type, T16: Type, T17: Type, T18: Type, T19: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19), R](f)
 
-@experimental
 private
 def stubbed20Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, T10: Type, T11: Type, T12: Type, T13: Type, T14: Type, T15: Type, T16: Type, T17: Type, T18: Type, T19: Type, T20: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20), R](f)
 
-@experimental
 private
 def stubbed21Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, T10: Type, T11: Type, T12: Type, T13: Type, T14: Type, T15: Type, T16: Type, T17: Type, T18: Type, T19: Type, T20: Type, T21: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21), R](f)
 
-@experimental
 private
 def stubbed22Macro[T1: Type, T2: Type, T3: Type, T4: Type, T5: Type, T6: Type, T7: Type, T8: Type, T9: Type, T10: Type, T11: Type, T12: Type, T13: Type, T14: Type, T15: Type, T16: Type, T17: Type, T18: Type, T19: Type, T20: Type, T21: Type, T22: Type, R: Type](f: Expr[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22) => R])(using Quotes): Expr[StubbedMethod[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22), R]] =
   new internal.StubMaker().getStubbed[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22), R](f)

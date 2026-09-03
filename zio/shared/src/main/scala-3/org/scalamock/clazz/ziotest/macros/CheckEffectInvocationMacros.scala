@@ -24,7 +24,6 @@ package org.scalamock.clazz.ziotest.macros
 import org.scalamock.clazz.{MockMaker, MockType}
 import org.scalamock.context.MockContext
 
-import scala.annotation.experimental
 import scala.quoted.*
 
 import zio.ZIO
@@ -80,7 +79,6 @@ import zio.ZIO
  * So when the method is called, it's not added to callLog immediately.
  * It's added only when the effect f(x) is actually called.
  */
-@experimental
 private[scalamock] object CheckEffectInvocationMacros {
 
   def mock[T: Type](mockContext: Expr[MockContext])(using Quotes): Expr[T] = {

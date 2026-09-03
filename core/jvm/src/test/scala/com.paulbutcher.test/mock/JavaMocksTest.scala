@@ -64,7 +64,7 @@ class JavaMocksTest extends IsolatedSpec {
 
     it should "mock a Polymorhpic Java interface" in { // test for issue #24
       val m = mock[PolymorphicJavaInterface]
-      (m.simplePolymorphicMethod _).expects("foo").returning(44)
+      (m.simplePolymorphicMethod[Int] _).expects("foo").returning(44)
       assertResult(44) { m.simplePolymorphicMethod[Int]("foo") }
     }
 

@@ -20,6 +20,7 @@
 
 package org.scalamock.test.scalatest
 
+import org.scalamock.function.MockFunction1
 import org.scalamock.scalatest.PathMockFactory
 import org.scalatest.exceptions.TestFailedException
 import org.scalatest.funspec
@@ -51,7 +52,7 @@ class PathSpecTest extends funspec.PathAnyFunSpec with Matchers with PathMockFac
     }
   
     it("can have expectations checked at the end of root suite") {
-      val mockFun = mockFunction[String, Unit]("mockFun")
+      val mockFun: MockFunction1[String, Unit] = mockFunction[String, Unit]("mockFun")
       mockFun expects "bottom-level"
       val caught = intercept[TestFailedException] {
         verifyExpectations()
