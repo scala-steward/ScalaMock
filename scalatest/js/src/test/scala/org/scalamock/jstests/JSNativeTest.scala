@@ -20,4 +20,11 @@ class JSNativeTest extends AnyFlatSpec with MockFactory with Matchers {
     (m.fillText _).expects("hello", 1.0, 2.0, 3.0).returning(()).once()
     m.fillText("hello", 1.0, 2.0, 3.0)
   }
+
+  it should "substitute a default value for an omitted 'js.native' default arg" in {
+    js.Dynamic.global.require("./core/js/src/test/js/fake-js-natives.js")
+    val m = mock[FakeJSNativeClass]
+    (m.fillText _).expects("hello", 1.0, 2.0, 0.0).returning(()).once()
+    m.fillText("hello", 1.0, 2.0)
+  }
 }
