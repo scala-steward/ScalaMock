@@ -32,6 +32,7 @@ private[clazz] object MockMaker:
     val utils = MakerUtils(using quotes)
     import utils.quotes.reflect.*
     val tpe = TypeRepr.of[T]
+    val isJs = utils.isJsAny(tpe)
 
     def createDefaultMockNameSymbol(classSymbol: Symbol) =
       Symbol.newVal(classSymbol, MockDefaultNameValName, TypeRepr.of[String], Flags.EmptyFlags, Symbol.noSymbol)
@@ -147,7 +148,14 @@ private[clazz] object MockMaker:
                 )
               }
             )
-        List(mockFunctionValDef, definitionOverride)
+
+        val jsMembers: List[Statement] =
+          if !isJs then Nil else utils.jsExposedMembers(classSymbol, definition, mockFunctionValDef)
+
+        mockFunctionValDef :: definitionOverride :: jsMembers
+      ,
+      clsAnnotations = utils.jsClassAnnotations(isJs),
+      selectable = !isJs
     )
 
-    instance.asExprOf[T & Selectable]
+    if isJs then instance.asExprOf[T] else instance.asExprOf[T & Selectable]

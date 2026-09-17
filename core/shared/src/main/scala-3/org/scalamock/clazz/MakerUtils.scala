@@ -65,7 +65,9 @@ class MakerUtils(using override val quotes: Quotes) extends Utils:
         )
     end asParent
 
-    if isTrait then
+    if isJsAny(tpe) then
+      List(asParent(TypeTree.of[T]))
+    else if isTrait then
       List(TypeTree.of[Object], asParent(TypeTree.of[T]), TypeTree.of[scala.reflect.Selectable])
     else
       List(asParent(TypeTree.of[T]), TypeTree.of[scala.reflect.Selectable])
@@ -91,7 +93,9 @@ class MakerUtils(using override val quotes: Quotes) extends Utils:
     extraDecls: (Symbol, List[MockableDefinition]) => List[Symbol],
     extraBody: (Symbol, List[MockableDefinition]) => List[Statement],
     methodDecls: (Symbol, MockableDefinition) => List[Symbol],
-    methodBody: (Symbol, MockableDefinition) => List[Statement]
+    methodBody: (Symbol, MockableDefinition) => List[Statement],
+    clsAnnotations: List[Term] = Nil,
+    selectable: Boolean = true
   ): Term =
     val tpe = TypeRepr.of[T]
     val parents = parentsOf[T]
@@ -100,12 +104,20 @@ class MakerUtils(using override val quotes: Quotes) extends Utils:
     val classSymbol: Symbol = Symbol.newClass(
       owner = Symbol.spliceOwner,
       name = anonName,
-      parents = parents.map {
+      parents = _ => parents.map {
         case term: Term => term.tpe
         case tree: TypeTree => tree.tpe
       },
       decls = classSymbol => extraDecls(classSymbol, methods) ::: methods.flatMap(methodDecls(classSymbol, _)),
-      selfType = None
+      selfType = None,
+      clsFlags = Flags.EmptyFlags,
+      clsPrivateWithin = Symbol.noSymbol,
+      clsAnnotations = clsAnnotations,
+      conMethodType = res => MethodType(Nil)(_ => Nil, _ => res),
+      conFlags = Flags.EmptyFlags,
+      conPrivateWithin = Symbol.noSymbol,
+      conParamFlags = List(Nil),
+      conParamPrivateWithins = List(Nil)
     )
 
     val classDef = ClassDef(
@@ -114,11 +126,13 @@ class MakerUtils(using override val quotes: Quotes) extends Utils:
       body = extraBody(classSymbol, methods) ::: methods.flatMap(methodBody(classSymbol, _))
     )
 
+    val resultTpe = if selectable then TypeTree.of[T & scala.reflect.Selectable] else TypeTree.of[T]
+
     Block(
       List(classDef),
       Typed(
         Apply(Select(New(TypeIdent(classSymbol)), classSymbol.primaryConstructor), Nil),
-        TypeTree.of[T & scala.reflect.Selectable]
+        resultTpe
       )
     )
   end buildInstance

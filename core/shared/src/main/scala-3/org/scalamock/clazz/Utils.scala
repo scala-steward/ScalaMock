@@ -20,6 +20,8 @@
 
 package org.scalamock.clazz
 
+import org.scalamock.util.Defaultable
+
 import scala.annotation.tailrec
 import scala.quoted.*
 
@@ -28,15 +30,70 @@ private[scalamock] class Utils(using val quotes: Quotes):
 
   import quotes.reflect.*
 
+  /**
+   *  Scala.js native types can only be extended by a non-native JS class.
+   *  Checked by name to stay safe on platforms without scalajs-library on the classpath.
+   */
+  def isJsAny(tpe: TypeRepr): Boolean =
+    tpe.baseClasses.exists(_.fullName == "scala.scalajs.js.Any")
+
+  private def jsMockRuntime: Symbol = Symbol.requiredModule("org.scalamock.util.JsMockRuntime")
+
+  private def getJsMember[T: Type](target: Term, name: String): Expr[T] =
+    val member = Apply(Select.unique(Ref(jsMockRuntime), "getMember"), List(target, Literal(StringConstant(name))))
+    '{ ${ member.asExpr }.asInstanceOf[T] }
+
+  private def setJsMember(target: Term, name: String, value: Term): Term =
+    Apply(Select.unique(Ref(jsMockRuntime), "setMember"), List(target, Literal(StringConstant(name)), value))
+
+  /** A non-native JS class is recognised by the Scala.js backend through this annotation. */
+  def jsClassAnnotations(isJs: Boolean): List[Term] =
+    if !isJs then Nil
+    else
+      val jsTypeAnnot = Symbol.classSymbol("scala.scalajs.js.annotation.internal.JSType")
+      List(Apply(Select(New(TypeIdent(jsTypeAnnot)), jsTypeAnnot.primaryConstructor), Nil))
+
+  /** Default value of each parameter that has one, in order; 'js.native' default args arrive as undefined. */
+  private def jsDefaults(definition: MockableDefinition): Expr[Seq[Option[Any]]] =
+    val paramSymbols = definition.symbol.paramSymss.flatten.filterNot(_.isType)
+    Expr.ofSeq(
+      paramSymbols.zip(definition.rawTypes).map { (paramSymbol, paramType) =>
+        val default =
+          if !paramSymbol.flags.is(Flags.HasDefault) then None
+          else paramType.asType match
+            case '[t] => Expr.summon[Defaultable[t]].map(d => '{ $d.default: Any })
+        default.fold('{ None: Option[Any] })(value => '{ Some($value) })
+      }
+    )
+
+  /**
+   *  Members of a macro generated JS class are not exposed to JS by the compiler,
+   *  so JS calls would reach the native member instead of the override.
+   *  The mock function and a JS function forwarding to it are assigned as own properties,
+   *  the former to be found by MockFunctionFinder, the latter to shadow the native member.
+   */
+  def jsExposedMembers(classSymbol: Symbol, definition: MockableDefinition, mockFunctionValDef: ValDef): List[Statement] =
+    val mockFunctionRef = Select(This(classSymbol), mockFunctionValDef.symbol)
+    val exposeMockFunction = setJsMember(This(classSymbol), definition.mockValName, mockFunctionRef)
+
+    if definition.symbol.isValDef then List(exposeMockFunction)
+    else
+      val arity = definition.rawTypes.length
+      val dispatcher = Apply(Select.unique(Ref(jsMockRuntime), s"fn$arity"), List(mockFunctionRef, jsDefaults(definition).asTerm))
+      List(exposeMockFunction, setJsMember(This(classSymbol), definition.symbol.name, dispatcher))
+
   case class StubWithMethod(stub: Term, method: MockableDefinition):
     def selectReflect[T: Type](name: MockableDefinition => String): Expr[T] =
-      '{
-        ${ stub.asExpr }
-          .asInstanceOf[scala.reflect.Selectable]
-          // https://github.com/lampepfl/dotty/issues/18612
-          .selectDynamic(${ Expr(scala.reflect.NameTransformer.encode(name(method))) })
-          .asInstanceOf[T]
-      }
+      if isJsAny(stub.tpe.widenTermRefByName) then
+        getJsMember[T](stub, name(method))
+      else
+        '{
+          ${ stub.asExpr }
+            .asInstanceOf[scala.reflect.Selectable]
+            // https://github.com/lampepfl/dotty/issues/18612
+            .selectDynamic(${ Expr(scala.reflect.NameTransformer.encode(name(method))) })
+            .asInstanceOf[T]
+        }
 
   object MockableDefinitions:
     private val objectMethods = TypeRepr.of[Object].typeSymbol.methodMembers.toSet
