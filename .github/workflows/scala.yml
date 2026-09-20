@@ -16,15 +16,14 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        java-version: 11
+        java-version: 17
         distribution: 'adopt'
     - uses: sbt/setup-sbt@v1
     - name: Run tests
       # Scala Native is Scala 3 only (crossScalaVersions is pinned to 3.x for
       # the .native projects), so plain `test` on the aggregated root project
-      # would still try to compile those modules with the Scala 3 compiler
-      # bridge, which requires a newer JDK than this job uses. Scope the run
-      # to the JVM/JS projects instead.
+      # would also re-run those modules' Scala 3 tests here, duplicating the
+      # scala_3 job. Scope the run to the JVM/JS projects instead.
       run: >
         sbt ++2.12.21
         scalamockJVM/test scalamockJS/test
@@ -42,7 +41,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        java-version: 11
+        java-version: 17
         distribution: 'adopt'
     - uses: sbt/setup-sbt@v1
     - name: Run tests
