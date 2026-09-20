@@ -15,9 +15,31 @@ jobs:
           distribution: 'adopt'
           cache: sbt
       - uses: sbt/setup-sbt@v1
+      # The default `+publishSigned` aggregates over the root, so during the
+      # 2.12/2.13 passes the Scala-3-only modules (specs2-5, Native) are still
+      # evaluated at 3.9.0 while `scalamock` is switched to Scala 2. Their
+      # `dependsOn(scalamock)` then degrades into an external
+      # `org.scalamock:scalamock_3:<version>` dependency, which cannot resolve
+      # because that artifact is exactly what this run is publishing. Scope
+      # each pass to the projects that support it instead, as scala.yml does.
       - run: sbt ci-release
         env:
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
           PGP_SECRET: ${{ secrets.PGP_SECRET }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          CI_RELEASE: >-
+            ; ++2.12.21
+            ; scalamockJVM/publishSigned ; scalamockJS/publishSigned
+            ; scalamock-zioJVM/publishSigned ; scalamock-zioJS/publishSigned
+            ; scalamock-cats-effectJVM/publishSigned ; scalamock-cats-effectJS/publishSigned
+            ; scalamock-specs2-4JVM/publishSigned ; scalamock-specs2-4JS/publishSigned
+            ; scalamock-scalatestJVM/publishSigned ; scalamock-scalatestJS/publishSigned
+            ; ++2.13.18
+            ; scalamockJVM/publishSigned ; scalamockJS/publishSigned
+            ; scalamock-zioJVM/publishSigned ; scalamock-zioJS/publishSigned
+            ; scalamock-cats-effectJVM/publishSigned ; scalamock-cats-effectJS/publishSigned
+            ; scalamock-specs2-4JVM/publishSigned ; scalamock-specs2-4JS/publishSigned
+            ; scalamock-scalatestJVM/publishSigned ; scalamock-scalatestJS/publishSigned
+            ; ++3.9.0
+            ; publishSigned
