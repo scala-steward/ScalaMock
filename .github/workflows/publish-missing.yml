@@ -32,6 +32,11 @@ jobs:
           PGP_SECRET: ${{ secrets.PGP_SECRET }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          # sbt-ci-release decides "is this a tag push?" from CI_COMMIT_TAG/GITHUB_REF,
+          # not from git tags. workflow_dispatch runs on a branch ref
+          # (GITHUB_REF=refs/heads/...), so without this it silently no-ops with
+          # "Snapshot releases must have -SNAPSHOT version number, doing nothing".
+          CI_COMMIT_TAG: v${{ inputs.version }}
           CI_RELEASE: >-
             ; ++2.12.21
             ; scalamock-specs2-4JVM/publishSigned ; scalamock-specs2-4JS/publishSigned
