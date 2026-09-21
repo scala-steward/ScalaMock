@@ -104,9 +104,12 @@ lazy val `scalamock-specs2-4` = crossProject(JSPlatform, JVMPlatform, NativePlat
     crossScalaSettings,
     libraryDependencies += specs2.value
   )
+  .jsSettings(name := "scalamock-specs2-4")
+  .jvmSettings(name := "scalamock-specs2-4")
   // Scala Native 0.5 dropped java.lang.reflect support, which the Scala 2 macros rely on.
   // Only Scala 3 (which uses scala.reflect.Selectable instead) is supported on Native.
   .nativeSettings(
+    name := "scalamock-specs2-4",
     crossScalaVersions := Seq(scalaVersion.value)
   )
   .dependsOn(scalamock)
@@ -122,6 +125,9 @@ lazy val `scalamock-specs2-5` = crossProject(JSPlatform, JVMPlatform, NativePlat
     crossScalaVersions := Seq(scalaVersion.value),
     libraryDependencies += specs2_5.value
   )
+  .jsSettings(name := "scalamock-specs2-5")
+  .jvmSettings(name := "scalamock-specs2-5")
+  .nativeSettings(name := "scalamock-specs2-5")
   .dependsOn(scalamock)
 
 lazy val `scalamock-scalatest` = crossProject(JSPlatform, JVMPlatform, NativePlatform)
@@ -132,9 +138,12 @@ lazy val `scalamock-scalatest` = crossProject(JSPlatform, JVMPlatform, NativePla
     crossScalaSettings,
     libraryDependencies += scalatest.value
   )
+  .jsSettings(name := "scalamock-scalatest")
+  .jvmSettings(name := "scalamock-scalatest")
   // Scala Native 0.5 dropped java.lang.reflect support, which the Scala 2 macros rely on.
   // Only Scala 3 (which uses scala.reflect.Selectable instead) is supported on Native.
   .nativeSettings(
+    name := "scalamock-scalatest",
     crossScalaVersions := Seq(scalaVersion.value)
   )
   .dependsOn(scalamock % "compile->compile;test->test")
